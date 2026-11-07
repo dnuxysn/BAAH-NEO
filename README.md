@@ -12,7 +12,7 @@ BAAH NEO 使用上游 BAAH 的任务与识图逻辑。支持覆盖升级。
 
 当前版本为 **0.1.0**（`com.baah.neo`）。[查看 GitHub Releases](https://github.com/dnuxysn/BAAH-NEO/releases)。本次发布源码，APK 将在内置运行环境的分发材料备齐后提供。
 
-[功能](#功能) · [实机截图](#实机截图) · [安装与使用](#安装与使用) · [定时任务](#定时任务) · [备份与更新](#备份与更新) · [问题反馈](#问题反馈) · [开发](#开发) · [开发与图标](#开发与图标) · [来源与许可](#来源与许可)
+[功能](#功能) · [实机截图](#实机截图) · [安装与使用](#安装与使用) · [定时任务](#定时任务) · [备份与更新](#备份与更新) · [问题反馈](#问题反馈) · [仓库文件](#仓库文件) · [开发](#开发) · [开发与图标](#开发与图标) · [来源与许可](#来源与许可)
 
 ## 功能
 
@@ -79,7 +79,7 @@ BAAH NEO 使用上游 BAAH 的任务与识图逻辑。支持覆盖升级。
 - 「设置 → 导入配置」恢复 BAAH NEO 的完整备份。
 - 单份运行配置可在配置管理界面导入和导出。
 
-完整备份可能包含已填写的账号或通知服务凭证，请妥善保管。恢复操作会替换对应数据，建议先导出当前备份。
+恢复操作会替换对应数据，建议先导出当前备份。
 
 ### 更新
 
@@ -103,6 +103,20 @@ NEO 应用与上游 BAAH 分别更新。
 
 报告运行缓慢时，请同时提供任务清单和各任务耗时。整轮时间会受任务数量、游戏等待、战斗过程及手机调度影响。
 
+## 仓库文件
+
+| 路径 | 说明 |
+| --- | --- |
+| [app/](app/) | Android 应用、任务适配、界面和单元测试 |
+| [docs/](docs/) | 实机截图和文档资源 |
+| [scripts/](scripts/) | 框架获取、签名初始化和验证工具 |
+| [third_party/](third_party/) | 第三方组件来源、许可证和框架头文件 |
+| [gradle/](gradle/) · [gradlew](gradlew) · [gradlew.bat](gradlew.bat) | Gradle Wrapper 和 Unix、Windows 入口 |
+| [build.gradle.kts](build.gradle.kts) · [settings.gradle.kts](settings.gradle.kts) · [gradle.properties](gradle.properties) | Gradle 工程设置 |
+| [framework.lock.json](framework.lock.json) · [framework.resolved.json](framework.resolved.json) | MaaFramework 版本锁定和实际使用的发布资产记录 |
+| [README.md](README.md) · [README.en.md](README.en.md) · [LICENSE](LICENSE) | 项目说明和许可证 |
+| [.gitignore](.gitignore) | 不纳入 Git 的本地文件和生成产物 |
+
 ## 开发
 
 ### 运行架构
@@ -112,25 +126,6 @@ NEO 使用 Project Interface V2 描述完整工作流和单项任务入口，由
 上游 BAAH Python 负责识图、任务顺序与游戏业务逻辑。NEO 提供 Android 宿主、Shizuku 服务、虚拟屏、截图与输入、定时、通知和备份。Python 直接读取虚拟屏截图服务输出的 BGR 帧。
 
 PI V2 解析器复用固定版本的 MaaFwApp 开源组件，来源记录见 [MaaFwApp PI 组件说明](third_party/MaaFwApp-pi/SOURCE.md)。随附 MaaFramework 版本锁定在 [framework.lock.json](framework.lock.json)。
-
-### 本地构建
-
-需要 JDK 21、Python 和 Android SDK 36，SDK extension 为 19。
-
-在项目根目录准备 `local.properties` 中的 Android SDK 路径，然后执行。
-
-```powershell
-python scripts/fetch_framework.py
-python scripts/create_neo_signing.py
-./gradlew.bat :app:assembleGithubDebug :app:testGithubDebugUnitTest :app:lintGithubDebug --console=plain
-python scripts/test_adapter_protocol.py
-```
-
-构建用于分发的 APK 时使用 `./gradlew.bat :app:assembleGithubRelease`，输出位于 `app/build/outputs/apk/github/release/`。
-
-签名生成脚本仅在首次建立开发环境时运行。后续构建沿用同一份 `neo-signing.properties` 和 `signing/`，以保持覆盖升级能力。签名文件与凭证仅保存在本地。
-
-构建 APK 还需自行提供 Python 根文件系统资产 `app/src/main/assets/baah-rootfs.tar.xz` 和四个 proot 共享库。资产来源见 [BAAH 适配来源记录](third_party/baah-adapter/README.md)。这些二进制运行环境资产未包含在源码仓库中。
 
 ### 数据位置
 

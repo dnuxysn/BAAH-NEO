@@ -12,7 +12,7 @@ BAAH NEO uses upstream BAAH's tasks and image recognition. You can install updat
 
 **Version 0.1.0** (`com.baah.neo`) · [GitHub Releases](https://github.com/dnuxysn/BAAH-NEO/releases)
 
-[Features](#features) · [Screenshot](#screenshot) · [Getting started](#getting-started) · [Scheduling](#scheduling) · [Backups and updates](#backups-and-updates) · [Reporting issues](#reporting-issues) · [Development](#development) · [Credits and license](#credits-and-license)
+[Features](#features) · [Screenshot](#screenshot) · [Getting started](#getting-started) · [Scheduling](#scheduling) · [Backups and updates](#backups-and-updates) · [Reporting issues](#reporting-issues) · [Repository layout](#repository-layout) · [Development](#development) · [Credits and license](#credits-and-license)
 
 ## Features
 
@@ -94,26 +94,25 @@ Include the BAAH NEO and upstream BAAH versions, your phone model and Android ve
 
 You can view and export launcher and BAAH task logs from **Settings**. For performance issues, include the task list and any per-task timings you have.
 
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| [app/](app/) | Android application, task adapter, UI, and unit tests |
+| [docs/](docs/) | Device screenshots and documentation assets |
+| [scripts/](scripts/) | Framework download, signing setup, and verification tools |
+| [third_party/](third_party/) | Third-party attribution, licenses, and framework headers |
+| [gradle/](gradle/) · [gradlew](gradlew) · [gradlew.bat](gradlew.bat) | Gradle Wrapper and entry points for Unix and Windows |
+| [build.gradle.kts](build.gradle.kts) · [settings.gradle.kts](settings.gradle.kts) · [gradle.properties](gradle.properties) | Gradle project configuration |
+| [framework.lock.json](framework.lock.json) · [framework.resolved.json](framework.resolved.json) | Pinned MaaFramework version and resolved artifact metadata |
+| [README.md](README.md) · [README.en.md](README.en.md) · [LICENSE](LICENSE) | Project documentation and license |
+| [.gitignore](.gitignore) | Local files and generated outputs excluded from Git |
+
 ## Development
 
 BAAH NEO uses Project Interface V2 to describe full workflows and individual tasks. MaaFramework Tasker starts the tasks and reports whether they completed, failed, or stopped. Upstream BAAH supplies the Python task logic and image recognition. The Android host provides Shizuku integration, the virtual display, screenshots and input, scheduling, notifications, and backups.
 
 The PI V2 parser reuses code from a pinned version of MaaFwApp. The bundled MaaFramework version is recorded in the framework lockfile. [Parser source notes](third_party/MaaFwApp-pi/SOURCE.md) · [Framework lockfile](framework.lock.json)
-
-### Local build
-
-Use JDK 21, Python, and Android SDK 36 with SDK extension 19. Set the Android SDK location in `local.properties`. The APK build also requires the Python root filesystem at `app/src/main/assets/baah-rootfs.tar.xz` and the four proot shared libraries. [Runtime asset provenance](third_party/baah-adapter/README.md)
-
-```powershell
-python scripts/fetch_framework.py
-python scripts/create_neo_signing.py
-./gradlew.bat :app:assembleGithubDebug :app:testGithubDebugUnitTest :app:lintGithubDebug --console=plain
-python scripts/test_adapter_protocol.py
-```
-
-Generate the signing configuration once for your local builds. Reuse the same signing key for updates to your installations. Keep `neo-signing.properties` and the `signing/` directory local.
-
-Build a distribution APK with `./gradlew.bat :app:assembleGithubRelease`. The output is in `app/build/outputs/apk/github/release/`.
 
 ### Contributing
 
