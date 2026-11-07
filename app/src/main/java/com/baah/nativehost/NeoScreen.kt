@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        app.control.refreshPermission()
         if (android.os.Build.VERSION.SDK_INT < 29) app.mainActivityOnTop.value = true
     }
 

@@ -46,8 +46,7 @@ class RunService : Service() {
         private var progressDone = 0
         private var progressTotal = 0
         fun resetProgress() { progressDone = 0; progressTotal = 0 }
-        private var tracker: android.graphics.Bitmap? = null
-        fun update(context: Context, text: String, done: Int = -1, total: Int = -1, active: Boolean = true) {
+        fun update(context: Context, text: String, done: Int = -1, total: Int = -1, active: Boolean = true, operationPercent: Int? = null) {
             val manager = context.getSystemService(NotificationManager::class.java)
             val app = context.applicationContext as NeoApp
             val enabled = com.baah.nativehost.notify.NotificationSettingsManager(context).json().optString("internalEnabled", "true").toBoolean()
@@ -57,20 +56,22 @@ class RunService : Service() {
             }
             manager.createNotificationChannel(NotificationChannel("automation", "挂机运行", NotificationManager.IMPORTANCE_LOW))
             manager.createNotificationChannel(NotificationChannel(RESULT_CHANNEL, "任务结果", NotificationManager.IMPORTANCE_HIGH))
-            manager.notify(402, notification(context, text, done, total, active))
+            manager.notify(402, notification(context, text, done, total, active, operationPercent))
         }
-        private fun notification(context: Context, text: String, done: Int = -1, total: Int = -1, active: Boolean = true): Notification {
+        private fun notification(context: Context, text: String, done: Int = -1, total: Int = -1, active: Boolean = true, operationPercent: Int? = null): Notification {
             val stop = PendingIntent.getService(context, 1, Intent(context, RunService::class.java).setAction("stop"), PendingIntent.FLAG_IMMUTABLE)
             val options = com.baah.nativehost.notify.NotificationSettingsManager(context).json()
             val app = context.applicationContext as NeoApp
             val phase = NotificationPhase.resolve(text, active, app.busy.value)
             if (done >= 0) progressDone = done
             if (total >= 0) progressTotal = total
-            if (phase == BaahPhase.Completed) progressDone = progressTotal
-            val tasks = app.progressTasks.takeIf { it.isNotEmpty() } ?: List(progressTotal.coerceAtLeast(0)) { "任务 ${it + 1}" }
-            val state = BaahProgress(phase, "BAAH NEO", UiStrings.text(text), progressDone, tasks)
-            if (tracker == null) tracker = loadBaahProgressTracker(context)
-            val result = buildProgressNotification(context, state, tracker, (context.applicationContext as NeoApp).gameAlive.value,
+            val taskTotal = progressTotal.takeIf { it > 0 } ?: app.progressTasks.size
+            val taskPercent = if (taskTotal > 0 && (app.running.value || total > 0)) {
+                ((100L * progressDone.coerceIn(0, taskTotal)) / taskTotal).toInt()
+            } else null
+            val percent = if (active) operationPercent ?: taskPercent else null
+            val state = BaahProgress(phase, "BAAH NEO", UiStrings.text(text), percent)
+            val result = buildProgressNotification(context, state, app.gameAlive.value,
                 if (!options.optString("internalEnabled", "true").toBoolean()) EventNotificationLevel.OFF else if (options.optString("popup", "false").toBoolean()) EventNotificationLevel.HIGH else EventNotificationLevel.DEFAULT, alert = !active)
             return Notification.Builder.recoverBuilder(context, result).addAction(Notification.Action.Builder(null, UiStrings.text("停止并关闭"), stop).build()).build()
         }

@@ -20,6 +20,7 @@ class NeoApp : Application() {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     val message = MutableStateFlow("就绪")
     val busy = MutableStateFlow(false)
+    val operationPercent = MutableStateFlow<Int?>(null)
     val running = MutableStateFlow(false)
     val status = MutableStateFlow(JSONObject())
     val logs = MutableStateFlow("")
@@ -58,9 +59,10 @@ class NeoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         CrashLog.install(this)
-        control = ControlConnection(this); data = UserData(this); runtime = RuntimeHost(this) {
-            message.value = it
-            if (busy.value) RunService.update(this, it)
+        control = ControlConnection(this); data = UserData(this); runtime = RuntimeHost(this) { text, percent ->
+            operationPercent.value = percent
+            message.value = text
+            if (busy.value && percent != null) RunService.update(this, text, operationPercent = percent)
         }
         com.baah.nativehost.legacy.NeoLocale.language = com.baah.nativehost.legacy.NeoLocale.resolve(data.loadSettings().optString("language", "system"))
         ScheduleReceiver.arm(this)
@@ -144,18 +146,22 @@ class NeoApp : Application() {
             operations.withLock {
                 if (showBusy) {
                     message.value = ""
+                    operationPercent.value = null
                     activeAction = currentCoroutineContext()[Job]
                     busy.value = true
                 }
                 try {
                     block()
                 } catch (e: CancellationException) {
+                    if (showBusy && operationPercent.value != null) message.value = "操作已取消"
                     throw e
                 } catch (e: Exception) {
                     message.value = "失败：${e.message}"
                 } finally {
                     if (showBusy) {
+                        if (!running.value && operationPercent.value != null) RunService.update(this@NeoApp, message.value, active = false)
                         busy.value = false
+                        operationPercent.value = null
                         activeAction = null
                     }
                 }
@@ -179,7 +185,6 @@ class NeoApp : Application() {
         catch (e: Exception) { message.value = "失败：${e.message}"; throw e }
         finally {
             if (display.value < 0) stopService(Intent(this, RunService::class.java))
-            RunService.update(this, message.value, active = false)
         }
     }
     suspend fun start(

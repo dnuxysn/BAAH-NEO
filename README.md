@@ -10,7 +10,7 @@
 
 BAAH NEO 使用上游 BAAH 的任务与识图逻辑。支持覆盖升级。
 
-当前版本为 **0.1.0**（`com.baah.neo`）。[下载 BAAH NEO 0.1.0 APK](https://github.com/dnuxysn/BAAH-NEO/releases/download/v0.1.0/BAAH-NEO-0.1.0.apk)。
+当前版本为 **0.1.1**（`com.baah.neo`）。[下载 BAAH NEO 0.1.1 APK](https://github.com/dnuxysn/BAAH-NEO/releases/download/v0.1.1/BAAH-NEO-0.1.1.apk)。
 
 [功能](#功能) · [实机截图](#实机截图) · [安装与使用](#安装与使用) · [定时任务](#定时任务) · [备份与更新](#备份与更新) · [问题反馈](#问题反馈) · [仓库文件](#仓库文件) · [开发](#开发) · [开发与图标](#开发与图标) · [来源与许可](#来源与许可)
 

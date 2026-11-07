@@ -4,15 +4,21 @@ import android.content.Context
 import android.system.Os
 import kotlinx.coroutines.*
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.utils.CountingInputStream
 import org.json.JSONObject
 import org.tukaani.xz.XZInputStream
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipInputStream
+import java.util.zip.ZipFile
 
-class RuntimeHost(private val app: Context, private val report: (String) -> Unit) {
+class RuntimeHost(private val app: Context, private val onProgress: (String, Int?) -> Unit) {
+    private fun report(message: String, percent: Int? = null) = onProgress(message, percent)
+
+    private fun percentage(range: IntRange, done: Long, total: Long): Int =
+        if (total <= 0) range.first
+        else range.first + ((range.last - range.first) * done.coerceIn(0, total) / total).toInt()
     val upstream = File(app.filesDir, "baah")
     val user = File(app.filesDir, "baah-user")
     private val root = File(app.filesDir, "rootfs")
@@ -44,24 +50,29 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
         File(root, ".baah-python-deps-ready-v1").delete()
         prepare()
     }
-    suspend fun cacheRelease(tag: String) { downloadArchive(tag, reportProgress = false) }
+    suspend fun cacheRelease(tag: String) { downloadArchive(tag) }
 
-    private suspend fun downloadArchive(tag: String, reportProgress: Boolean = true): File {
+    private suspend fun downloadArchive(tag: String, progress: IntRange? = null, label: String = ""): File {
         require(tag.matches(Regex("[A-Za-z0-9._-]+")))
         val destination = File(app.filesDir, "downloads/baah-$tag.zip").apply { parentFile!!.mkdirs() }
         if (destination.isFile) return destination
+        progress?.let { report(label, it.first) }
         val temporary = File.createTempFile("${destination.name}-", ".part", destination.parentFile)
         val ref = "tags/$tag"
         try {
             val conn = open("https://codeload.github.com/BlueArchiveArisHelper/BAAH/zip/refs/$ref")
             try {
+                val length = conn.contentLengthLong
                 conn.inputStream.buffered().use { source -> temporary.outputStream().use { output ->
                     val buffer = ByteArray(64 * 1024); var count = 0L; var last = 0L
                     while (true) {
                         currentCoroutineContext().ensureActive()
                         val n = source.read(buffer); if (n < 0) break
                         output.write(buffer, 0, n); count += n
-                        if (reportProgress && System.currentTimeMillis() - last > 300) { report("下载 BAAH $tag：${count / 1024} KiB"); last = System.currentTimeMillis() }
+                        if (progress != null && System.currentTimeMillis() - last > 300) {
+                            report(label, percentage(progress, count, length))
+                            last = System.currentTimeMillis()
+                        }
                     }
                 } }
             } finally { conn.disconnect() }
@@ -71,11 +82,13 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
     }
 
     suspend fun prepare() = withContext(Dispatchers.IO) {
+        val needsSetup = !ready()
         if (!File(root, ".baah-environment-ready").isFile) extract()
+        if (needsSetup) report("准备 Python 环境", 30)
         copyAssets("baah-aos", adapter)
-        if (!File(upstream, "BAAH.py").isFile) update(false)
+        if (!File(upstream, "BAAH.py").isFile) update(false, initialSetup = true)
         if (!File(root, ".baah-python-deps-ready-v1").isFile) {
-            report("正在安装 Python 依赖，请保持联网")
+            report("正在安装 Python 依赖，请保持联网", 75)
             val log = File(app.filesDir, "python-setup.log")
             val task = spawn(listOf("/usr/bin/python3", "-u", "/opt/baah-aos/python_setup.py"), log)
             try {
@@ -83,7 +96,8 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
                     while (task.isAlive) {
                         log.takeIf { it.exists() }?.readLines()?.lastOrNull { it.startsWith("[BAAH-AOS-SETUP] ") }?.let { line ->
                             val event = JSONObject(line.substringAfter("[BAAH-AOS-SETUP] "))
-                            report("${event.getString("title")}（${event.getInt("done")}/${event.getInt("total")}）")
+                            report(event.getString("title"), percentage(75..99,
+                                event.getLong("done"), event.getLong("total")))
                         }
                         delay(1000)
                     }
@@ -93,18 +107,20 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
                 }
             } finally { if (task.isAlive) task.destroyForcibly() }
         }
-        report("BAAH 运行环境已就绪")
+        if (needsSetup) report("BAAH 运行环境已就绪", 100)
     }
     private suspend fun extract() {
-        report("首次解压 Python 环境（约 157 MiB 压缩包）")
+        report("解压 Python 环境", 0)
         root.mkdirs()
         // Overlaying a prior pip environment can mix incompatible package versions.
         clearGuestRoot(root)
         val links = mutableListOf<Pair<File, String>>()
         val hardLinks = mutableListOf<Pair<File, File>>()
-        var count = 0
-        app.assets.open("baah-rootfs.tar.xz").buffered(256 * 1024).use { source ->
+        app.assets.openFd("baah-rootfs.tar.xz").use { asset ->
+            val compressedSize = asset.length
+            val source = CountingInputStream(asset.createInputStream().buffered(256 * 1024))
             TarArchiveInputStream(XZInputStream(source)).use { tar ->
+                var lastPercent = 0
                 while (true) {
                     currentCoroutineContext().ensureActive()
                     val entry = tar.nextEntry ?: break
@@ -118,7 +134,11 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
                             Os.chmod(file.absolutePath, entry.mode and 511)
                         }
                     }
-                    if (++count % 500 == 0) report("解压 Python 环境：已处理 $count 个条目")
+                    val percent = percentage(0..29, source.bytesRead, compressedSize)
+                    if (percent != lastPercent) {
+                        report("解压 Python 环境", percent)
+                        lastPercent = percent
+                    }
                 }
             }
         }
@@ -127,27 +147,38 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
         check(File(root, "usr/bin/python3.12").isFile)
         File(root, ".baah-environment-ready").writeText("1")
     }
-    suspend fun update(beta: Boolean, selectedTag: String? = null) = withContext(Dispatchers.IO) {
+    suspend fun update(beta: Boolean, selectedTag: String? = null, initialSetup: Boolean = false) = withContext(Dispatchers.IO) {
         check(process?.isAlive != true) { "请先关闭运行环境再更新" }
-        report("正在查询 BAAH ${if (beta) "测试" else "稳定"}更新")
+        val downloadProgress = if (initialSetup) 35..64 else 0..74
+        val unpackProgress = if (initialSetup) 65..74 else 75..99
+        val downloadLabel = "下载上游BAAH"
+        if (initialSetup) report(downloadLabel, downloadProgress.first)
+        else report("正在查询 BAAH ${if (beta) "测试" else "稳定"}更新")
         val tag = selectedTag ?: releaseTag(beta)
         require(tag.matches(Regex("[A-Za-z0-9._-]+")))
         val stage = File(app.filesDir, "upstream-staging-${System.nanoTime()}").apply { mkdirs() }
         try {
-            val archive = downloadArchive(tag)
-            ZipInputStream(archive.inputStream().buffered()).use { zip ->
-                    var files = 0
-                    while (true) {
-                        currentCoroutineContext().ensureActive()
-                        val entry = zip.nextEntry ?: break
-                        val relative = entry.name.substringAfter('/', "")
-                        if (relative.isEmpty()) continue
-                        val target = child(stage, relative)
-                        if (entry.isDirectory) target.mkdirs() else {
-                            target.parentFile!!.mkdirs(); target.outputStream().use { zip.copyTo(it) }
-                        }
-                        if (++files % 100 == 0) report("下载与解压 BAAH：$files 个文件")
+            val archive = downloadArchive(tag, downloadProgress, downloadLabel)
+            val unpackLabel = "解压上游BAAH"
+            report(unpackLabel, unpackProgress.first)
+            ZipFile(archive).use { zip ->
+                var lastPercent = unpackProgress.first
+                for ((index, entry) in zip.entries().asSequence().withIndex()) {
+                    currentCoroutineContext().ensureActive()
+                    val relative = entry.name.substringAfter('/', "")
+                    if (relative.isEmpty()) continue
+                    val target = child(stage, relative)
+                    if (entry.isDirectory) target.mkdirs()
+                    else {
+                        target.parentFile!!.mkdirs()
+                        zip.getInputStream(entry).use { input -> target.outputStream().use(input::copyTo) }
                     }
+                    val percent = percentage(unpackProgress, (index + 1).toLong(), zip.size().toLong())
+                    if (percent != lastPercent) {
+                        report(unpackLabel, percent)
+                        lastPercent = percent
+                    }
+                }
             }
             check(File(stage, "BAAH.py").isFile && File(stage, "main.py").isFile) { "下载内容不是完整 BAAH" }
             // Preserve all runtime state, configurations and account values across updates.
@@ -164,7 +195,7 @@ class RuntimeHost(private val app: Context, private val report: (String) -> Unit
             }
             if (!stage.renameTo(upstream)) { if (old.exists()) old.renameTo(upstream); error("上游更新切换失败") }
             File(app.filesDir, "upstream-version.txt").writeText(tag)
-            report("BAAH $tag 已安装。$editionUpdateMessage")
+            if (!initialSetup) report("BAAH $tag 已安装。$editionUpdateMessage", 100)
         } finally { stage.deleteRecursively() }
     }
     suspend fun launch(display: Int) = withContext(Dispatchers.IO) {

@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="vertical" android:paddingTop="4dp" android:paddingBottom="4dp">
-    <TextView android:id="@+id/baah_notification_title"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Material.Notification.Title"
-        android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
-    <TextView android:id="@+id/baah_notification_detail"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textAppearance="@android:style/TextAppearance.Material.Notification"
-        android:maxLines="2" android:ellipsize="end" />
-    <ImageView android:id="@+id/baah_notification_track"
-        android:layout_width="match_parent" android:layout_height="44dp"
-        android:layout_marginTop="12dp" android:scaleType="fitXY"
-        android:contentDescription="@string/baah_notification_progress_description" />
+    android:gravity="center_vertical" android:paddingTop="3dp" android:paddingBottom="3dp">
+    <ImageView android:layout_width="32dp" android:layout_height="32dp"
+        android:src="@drawable/neo_icon" android:importantForAccessibility="no" />
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="8dp">
+        <TextView android:id="@+id/baah_notification_detail"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textAppearance="@android:style/TextAppearance.Material.Notification"
+            android:maxLines="1" android:ellipsize="end" />
+        <ProgressBar android:id="@+id/baah_notification_track"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent" android:layout_height="4dp"
+            android:layout_marginTop="5dp" android:indeterminate="false"
+            android:minHeight="4dp" android:maxHeight="4dp"
+            android:progressDrawable="@drawable/neo_notification_progress"
+            android:contentDescription="@string/baah_notification_progress_description" />
+    </LinearLayout>
 </LinearLayout>

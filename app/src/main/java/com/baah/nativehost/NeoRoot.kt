@@ -29,6 +29,7 @@ import org.json.*
 /** BAAH-AOS page composition and styling; independent NEO services provide all actions. */
 @Composable fun NeoRoot(app: NeoApp, export: () -> Unit, restore: () -> Unit, backupPreview: BackupPreview? = null, cancelRestore: () -> Unit = {}, confirmRestore: () -> Unit = {}) {
     val busy by app.busy.collectAsState(); val running by app.running.collectAsState(); val message by app.message.collectAsState()
+    val operationPercent by app.operationPercent.collectAsState()
     var showProgress by remember { mutableStateOf(false) }
     LaunchedEffect(busy) {
         showProgress = false
@@ -104,15 +105,38 @@ import org.json.*
         if (busy && showProgress) BaahDialog(onDismissRequest = {}, title = { Text("正在处理") }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 if (message.isNotBlank()) Text(message)
-                LinearProgressIndicator(Modifier.fillMaxWidth())
+                operationPercent?.let { percent ->
+                    Text("$percent%")
+                    LinearProgressIndicator(
+                        progress = { percent / 100f },
+                        modifier = Modifier.fillMaxWidth(),
+                        gapSize = 0.dp,
+                        drawStopIndicator = {},
+                    )
+                }
             }
         }, dismissButton = { TextButton({ app.requestStop(release = true) }) { Text("取消") } })
         if (!busy && !app.runtime.ready()) BaahDialog(onDismissRequest = {}, title = { Text("首次初始化") },
-            text = { Text("准备 Python 环境并下载上游 BAAH。任务配置单独保存，初始化过程中会显示实际进度。") },
+            text = { Text("准备Python环境并下载上游BAAH。") },
             confirmButton = { TextButton({ app.action { app.prepareEnvironment() } }) { Text("开始初始化") } })
-        else if (!busy && permission == false) BaahDialog(onDismissRequest = {}, title = { Text("Shizuku 权限") },
-            text = { Text("请保持 Shizuku 已通过无线调试启动，并授予 BAAH NEO 控制权限。") },
-            confirmButton = { TextButton({ runCatching { app.control.requestPermission() }.onFailure { notice = it.message } }) { Text("授权") } })
+        else if (!busy) {
+            val prompt = when (permission) {
+                ControlConnection.PermissionState.Request -> "请授予 BAAH NEO Shizuku 权限。" to "授权"
+                ControlConnection.PermissionState.OpenManager -> "请在 Shizuku 中启动服务，或在已授权应用中允许 BAAH NEO。" to "打开 Shizuku"
+                ControlConnection.PermissionState.Install -> "请先下载并安装 Shizuku。" to "下载 Shizuku"
+                else -> null
+            }
+            if (prompt != null) BaahDialog(
+                onDismissRequest = {},
+                title = { Text("Shizuku 权限") },
+                text = { Text(prompt.first) },
+                confirmButton = {
+                    TextButton({ runCatching { app.control.requestPermission() }.onFailure { notice = it.message } }) {
+                        Text(prompt.second)
+                    }
+                }
+            )
+        }
         if (quick) NeoQuickOptions(app, quickAnchor) { quick = false }
         backupPreview?.let { backup -> BaahDialog(onDismissRequest = cancelRestore, title = { Text("恢复完整备份") }, text = { Text(backup.summary()) },
             confirmButton = { TextButton(confirmRestore) { Text("恢复") } }, dismissButton = { TextButton(cancelRestore) { Text("取消") } }) }
@@ -126,6 +150,8 @@ import org.json.*
     var revision by remember { mutableIntStateOf(0) }; val settings = remember(revision) { app.data.loadSettings() }
     var result by remember { mutableStateOf<String?>(null) }
     var updateReady by remember { mutableStateOf<String?>(null) }
+    var appUpdateReady by remember { mutableStateOf<NeoAppRelease?>(null) }
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     var rawLog by remember { mutableStateOf<String?>(null) }
     var logTitle by remember { mutableStateOf("启动器日志") }
     var logFiles by remember { mutableStateOf<List<java.io.File>?>(null) }
@@ -133,17 +159,6 @@ import org.json.*
     val availableUpdate by app.availableUpdate.collectAsState()
     val logStore = remember { BaahLogs(app) }
     val logExporter = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri -> uri?.let { app.action { logStore.export(it, exportBaah); result = "日志已导出" } } }
-    val apkPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let { app.action {
-        val file = java.io.File(app.cacheDir, "compare-neo.apk")
-        try {
-            app.contentResolver.openInputStream(it)!!.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
-            val archive = app.packageManager.getPackageArchiveInfo(file.path, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES) ?: error("无法读取 APK")
-            val installed = app.packageManager.getPackageInfo(app.packageName, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES)
-            val signatureMatches = archive.signingInfo?.apkContentsSigners?.map { it.toCharsString() } == installed.signingInfo?.apkContentsSigners?.map { it.toCharsString() }
-            result = "当前：${installed.versionName}\nAPK：${archive.versionName}\n包名：${archive.packageName}\n" +
-                if (archive.packageName != app.packageName) "这是另一款应用，不能作为 BAAH NEO 更新" else if (!signatureMatches) "签名不同，不能覆盖当前 NEO" else if (archive.longVersionCode > installed.longVersionCode) "发现较新版本，签名一致" else "版本未更新，签名一致"
-        } finally { file.delete() }
-    } } }
     fun option(key: String, value: Any) { app.action(showBusy = false) { app.data.saveSettings(app.data.loadSettings().put(key, value)); revision++; changed() } }
     Column(Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("设置", fontSize = 30.sp, modifier = Modifier.padding(bottom = 12.dp))
@@ -177,7 +192,11 @@ import org.json.*
             Toggle("自动下载更新", settings.optBoolean("autoDownload")) { option("autoDownload", it) }
             Text("仅用于有发布地址的 BAAH 更新", fontSize = 12.sp)
             HorizontalDivider()
-            SettingsAction("检查软件更新", "比较 BAAH NEO 本地安装包", !busy, dimmed = showBusy) { apkPicker.launch(arrayOf("application/vnd.android.package-archive", "application/octet-stream")) }
+            SettingsAction("检查软件更新", "当前 BAAH NEO：${BuildConfig.VERSION_NAME}", !busy, dimmed = showBusy) { app.action {
+                val release = NeoAppUpdates.latest(settings.optBoolean("appBeta"))
+                if (NeoAppUpdates.compareVersions(release.tag, BuildConfig.VERSION_NAME) > 0) appUpdateReady = release
+                else result = "当前已是最新软件版本：${BuildConfig.VERSION_NAME}"
+            } }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(!settings.optBoolean("appBeta"), { option("appBeta", false) }, { Text("稳定版", fontSize = 13.sp) }, modifier = Modifier.height(40.dp))
                 FilterChip(settings.optBoolean("appBeta"), { option("appBeta", true) }, { Text("公测版", fontSize = 13.sp) }, modifier = Modifier.height(40.dp))
@@ -218,6 +237,17 @@ import org.json.*
             Text("${app.applicationInfo.loadLabel(app.packageManager)} ${BuildConfig.VERSION_NAME}", fontSize = 16.sp)
             Text("开源致谢 · BAAH-AOS、BAAH、MaaFramework", fontSize = 12.sp)
         }
+    }
+    appUpdateReady?.let { release ->
+        val download = release.apkUrl.takeUnless { BuildConfig.PRIVATE_EDITION }
+        BaahDialog(onDismissRequest = { appUpdateReady = null }, title = { Text(release.tag) },
+            text = { Text(if (BuildConfig.PRIVATE_EDITION) "发现 GitHub 新版本。当前为自用构建，请使用同包名的安装包更新。" else "发现 GitHub 新版本。") },
+            confirmButton = { TextButton({
+                appUpdateReady = null
+                runCatching { uriHandler.openUri(download ?: release.pageUrl) }
+                    .onFailure { result = "无法打开 GitHub 发布页面" }
+            }) { Text(if (download == null) "查看发布" else "下载 APK") } },
+            dismissButton = { TextButton({ appUpdateReady = null }) { Text("取消") } })
     }
     updateReady?.let { tag -> BaahDialog(onDismissRequest = { updateReady = null }, title = { Text(tag) }, text = { Text("下载并安装此版本？用户配置将保留。") },
         confirmButton = { TextButton(enabled = !busy && !running, onClick = { updateReady = null; app.action { app.closeSession(); app.runtime.update(settings.optBoolean("beta"), tag); app.availableUpdate.value = null; result = editionUpdateMessage } }) { Text("更新") } }, dismissButton = { TextButton({ updateReady = null }) { Text("取消") } }) }

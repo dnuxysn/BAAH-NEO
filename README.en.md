@@ -10,7 +10,7 @@ BAAH NEO is an Android assistant for Blue Archive dailies, built on MaaFramework
 
 BAAH NEO uses upstream BAAH's tasks and image recognition. You can install updates over an existing copy of BAAH NEO.
 
-**Version 0.1.0** (`com.baah.neo`) · [GitHub Releases](https://github.com/dnuxysn/BAAH-NEO/releases)
+**Version 0.1.1** (`com.baah.neo`) · [GitHub Releases](https://github.com/dnuxysn/BAAH-NEO/releases)
 
 [Features](#features) · [Screenshot](#screenshot) · [Getting started](#getting-started) · [Scheduling](#scheduling) · [Backups and updates](#backups-and-updates) · [Reporting issues](#reporting-issues) · [Repository layout](#repository-layout) · [Development](#development) · [Credits and license](#credits-and-license)
 
@@ -38,7 +38,7 @@ Available tasks and options depend on the installed version of upstream BAAH and
 - Shizuku running and authorized for BAAH NEO.
 - Internet access and enough storage to set up the Python environment and download upstream BAAH and its dependencies on first launch.
 
-[Download BAAH NEO 0.1.0 APK](https://github.com/dnuxysn/BAAH-NEO/releases/download/v0.1.0/BAAH-NEO-0.1.0.apk).
+[Download BAAH NEO 0.1.1 APK](https://github.com/dnuxysn/BAAH-NEO/releases/download/v0.1.1/BAAH-NEO-0.1.1.apk).
 
 ### First run
 
