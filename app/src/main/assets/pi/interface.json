@@ -1,0 +1,43 @@
+{
+  "interface_version": 2,
+  "name": "BAAH NEO",
+  "version": "0.1.0",
+  "controller": [
+    {
+      "name": "Android",
+      "type": "Adb"
+    }
+  ],
+  "resource": [
+    {
+      "name": "BAAH runtime",
+      "path": [
+        "resource"
+      ]
+    }
+  ],
+  "task": [
+    {
+      "name": "workflow",
+      "label": "按配置运行",
+      "entry": "BaahWorkflow",
+      "controller": [
+        "Android"
+      ],
+      "resource": [
+        "BAAH runtime"
+      ]
+    },
+    {
+      "name": "single-task",
+      "label": "快速调用任务",
+      "entry": "BaahSingleTask",
+      "controller": [
+        "Android"
+      ],
+      "resource": [
+        "BAAH runtime"
+      ]
+    }
+  ]
+}

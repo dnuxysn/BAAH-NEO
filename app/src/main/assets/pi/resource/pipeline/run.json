@@ -1,0 +1,10 @@
+{
+  "BaahWorkflow": {
+    "action": "Custom",
+    "custom_action": "NeoBaahRun"
+  },
+  "BaahSingleTask": {
+    "action": "Custom",
+    "custom_action": "NeoBaahRun"
+  }
+}

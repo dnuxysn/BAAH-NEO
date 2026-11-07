@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources><string name="option_checkbox_count_at_least">Select at least %1$d</string>
+    <string name="option_checkbox_count_at_most">Select at most %1$d</string>
+    <string name="option_checkbox_count_between">Select %1$d–%2$d</string>
+    <string name="option_checkbox_count_exactly">Select exactly %1$d</string>
+
+    
+    <string name="diagnostic_interface_read_failed">Failed to read interface.json: %1$s</string>
+    <string name="diagnostic_missing_interface_version">Missing interface_version (PI V2 requires 2)</string>
+    <string name="diagnostic_unsupported_interface_version">Unsupported interface_version %1$d (only 2 is supported)</string>
+    <string name="diagnostic_json_parse_failed">Failed to parse JSON: %1$s</string>
+    <string name="diagnostic_translation_json_parse_failed">Failed to parse translation JSON: %1$s</string>
+    <string name="diagnostic_entry_not_object">%1$s entry is not an object</string>
+    <string name="diagnostic_required_field_missing">%1$s is missing %2$s</string>
+    <string name="diagnostic_resource_path_missing">Resource "%1$s" is missing path</string>
+    <string name="diagnostic_no_adb_controller">This project declares no Adb controller; tasks restricted to a controller are unavailable</string>
+    <string name="diagnostic_language_path_invalid">Language "%1$s" path is not a string</string>
+    <string name="diagnostic_import_read_failed">Failed to read import; skipped: %1$s</string>
+    <string name="diagnostic_project_has_no_tasks">Project declares no tasks</string>
+    <string name="diagnostic_duplicate_declaration">Duplicate %1$s "%2$s"; keeping the first declaration</string>
+    <string name="diagnostic_translation_read_failed">Failed to read translation file: %1$s</string>
+    <string name="diagnostic_description_read_failed">Failed to read description file; keeping original text: %1$s</string>
+    <string name="diagnostic_default_case_missing">Option "%1$s" default_case "%2$s" is not in cases</string>
+    <string name="diagnostic_input_has_no_fields">Input option "%1$s" has no usable inputs</string>
+    <string name="diagnostic_setting_option_not_global">Setting "%1$s" lists option "%2$s", which is not in global_option; hidden</string>
+    <string name="diagnostic_password_default_ignored">Option "%1$s" password input "%2$s" must not have a default; ignored</string>
+    <string name="diagnostic_preset_password_ignored">Preset "%1$s" sets a value for option "%2$s" password input "%3$s"; ignored</string>
+    <string name="diagnostic_checkbox_count_adjusted">Option "%1$s" %2$s is %3$d; using %4$d</string>
+    <string name="diagnostic_checkbox_count_ignored">Option "%1$s" %2$s is %3$d; ignored</string>
+    <string name="diagnostic_checkbox_default_count_out_of_range">Option "%1$s" default_case has %2$d items; requirement: %3$s</string>
+    <string name="diagnostic_unsupported_option_type">Option "%1$s" type "%2$s" is unsupported on Android; skipped</string>
+    <string name="diagnostic_invalid_option_type">Option "%1$s" has invalid type: %2$s</string>
+    <string name="diagnostic_option_case_not_object">Option "%1$s" contains a case that is not an object</string>
+    <string name="diagnostic_option_case_name_missing">Option "%1$s" contains a case without name</string>
+    <string name="diagnostic_invalid_pipeline_type">Input "%1$s.%2$s" has invalid pipeline_type %3$s; using string</string>
+    <string name="diagnostic_regex_compile_failed">Input "%1$s.%2$s" verify regex failed to compile: %3$s</string>
+    <string name="diagnostic_missing_reference">References missing %1$s "%2$s"</string>
+    <string name="diagnostic_option_cycle">Option references form a cycle: %1$s</string>
+    <string name="diagnostic_directory_enumeration_failed">Failed to enumerate %1$s directory: %2$s</string>
+    <string name="diagnostic_no_available_resource">No resource is available</string>
+    <string name="diagnostic_resource_selection_missing">Resource "%1$s" no longer exists; falling back to %2$s</string>
+    <string name="diagnostic_controller_selection_missing">Controller "%1$s" no longer exists; falling back to %2$s</string>
+    <string name="diagnostic_none">none</string>
+    <string name="diagnostic_active_configuration_missing">activeConfigurationId points to a missing configuration</string>
+    <string name="diagnostic_configured_task_missing">Task "%1$s" is no longer in the project</string>
+    <string name="diagnostic_runtime_no_resource">No resource is available to build the runtime environment</string>
+    <string name="diagnostic_option_unset_without_default">Option "%1$s" is unset and has no default</string>
+    <string name="diagnostic_invalid_input">Option "%1$s" input "%2$s" is invalid: %3$s</string>
+    <string name="diagnostic_checkbox_count_out_of_range">Option "%1$s" has %2$d selected; requirement: %3$s</string>
+    <string name="diagnostic_integer_conversion_failed">Option "%1$s" input "%2$s" cannot be converted to an integer</string>
+    <string name="diagnostic_boolean_conversion_failed">Option "%1$s" input "%2$s" cannot be converted to a boolean</string>
+    </resources>

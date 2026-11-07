@@ -1,0 +1,23 @@
+{
+  "tag": "v5.15.0",
+  "asset": "MAA-android-aarch64-v5.15.0.zip",
+  "digest": "sha256:2b880f372833cad314a54b1316252162c3f66c4f20a4fcab40eb04cdb6c7a31e",
+  "source": "https://github.com/MaaXYZ/MaaFramework/releases/download/v5.15.0/MAA-android-aarch64-v5.15.0.zip",
+  "libraries": [
+    "libMaaAdbControlUnit.so",
+    "libMaaAgentClient.so",
+    "libMaaAgentServer.so",
+    "libMaaAndroidNativeControlUnit.so",
+    "libMaaCustomControlUnit.so",
+    "libMaaFramework.so",
+    "libMaaRecordControlUnit.so",
+    "libMaaReplayControlUnit.so",
+    "libMaaToolkit.so",
+    "libMaaUtils.so",
+    "libc++_shared.so",
+    "libfastdeploy_ppocr.so",
+    "libncnn.so",
+    "libonnxruntime.so",
+    "libopencv_world4.so"
+  ]
+}

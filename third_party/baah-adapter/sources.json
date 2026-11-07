@@ -1,0 +1,50 @@
+{
+  "source": "BAAH-AOS (MaaFwApp-derived)",
+  "scope": "Original fingerprints for the Python adapter files included in this repository.",
+  "files": [
+    {
+      "path": "console_boot.py",
+      "sha256": "4dcb78fde07d4421ff57dabbc8dc5bbeb427357374a91d62ed7f31e4fc095b1a"
+    },
+    {
+      "path": "fast_adb.py",
+      "sha256": "d93878b6222803d6cab7f2d4a340d225bd689019da6b8470ecdf0680d2323451"
+    },
+    {
+      "path": "python_setup.py",
+      "sha256": "ee78996998e7687b388da0bd3237c853da15f7046ad2267bf98a8707b378bdd9"
+    },
+    {
+      "path": "runner.py",
+      "sha256": "b96a454c1c2c7c7735e41092e95d3e449c91f225e153d30774e8fd2506ecfc31"
+    },
+    {
+      "path": "schema_en_US.json",
+      "sha256": "b13fbadd12960323e1acb788284e876732f6e86f8485d7fb69cefa46a75a0f5d"
+    },
+    {
+      "path": "schema_jp_JP.json",
+      "sha256": "9ae3c2be6189226c8641cfc509731dfb6235373ecd22aa90bf1a6097434b0876"
+    },
+    {
+      "path": "schema_zh_CN.json",
+      "sha256": "4d9dda10a3ade1f297e45df4d0e146b9a105584d893314926b20b97e31202a46"
+    },
+    {
+      "path": "screenshot_runtime.py",
+      "sha256": "850bb3a01bd23964f697ad9c53f655da4a66036d24f7f318ac2f753f21363888"
+    },
+    {
+      "path": "wrapper.py",
+      "sha256": "b1c104ca088b7cbd9d806fa874edea21c07ff39de92520c7af5e39d3686a439f"
+    },
+    {
+      "path": "seeds/default.json",
+      "sha256": "f6986a1198de115926646e689cd53aea4ec756078ab64c09808fcdc45c1e4f4a"
+    },
+    {
+      "path": "seeds/example.json",
+      "sha256": "f6986a1198de115926646e689cd53aea4ec756078ab64c09808fcdc45c1e4f4a"
+    }
+  ]
+}

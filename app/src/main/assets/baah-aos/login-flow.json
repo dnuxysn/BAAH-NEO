@@ -1,0 +1,655 @@
+{
+  "steps": {
+    "ifelse_action_f": {
+      "zh": "条件判断是否执行",
+      "en": "Conditional Judgment",
+      "data": {
+        "id_n": "ifelse_action_f",
+        "i_f_o": [
+          {
+            "id_n": "equal_p",
+            "c_obj": {
+              "id_n": "ocr_pic_a",
+              "a_p": [
+                {
+                  "id_n": "left_up_x",
+                  "p_v": 0
+                },
+                {
+                  "id_n": "left_up_y",
+                  "p_v": 0
+                },
+                {
+                  "id_n": "right_down_x",
+                  "p_v": 100
+                },
+                {
+                  "id_n": "right_down_y",
+                  "p_v": 100
+                }
+              ]
+            },
+            "c_v": [
+              {
+                "id_n": "value",
+                "p_v": ""
+              }
+            ]
+          },
+          {
+            "id_n": "click_xy_a",
+            "a_p": [
+              {
+                "id_n": "x",
+                "p_v": 0
+              },
+              {
+                "id_n": "y",
+                "p_v": 0
+              }
+            ]
+          },
+          {
+            "id_n": "click_xy_a",
+            "a_p": [
+              {
+                "id_n": "x",
+                "p_v": 0
+              },
+              {
+                "id_n": "y",
+                "p_v": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "run_until_f": {
+      "zh": "循环执行直到终止",
+      "en": "Run Until Completed",
+      "data": {
+        "id_n": "run_until_f",
+        "i_f_o": [
+          {
+            "id_n": "maxtimes",
+            "p_v": 5
+          },
+          {
+            "id_n": "click_xy_a",
+            "a_p": [
+              {
+                "id_n": "x",
+                "p_v": 0
+              },
+              {
+                "id_n": "y",
+                "p_v": 0
+              }
+            ]
+          },
+          {
+            "id_n": "equal_p",
+            "c_obj": {
+              "id_n": "ocr_pic_a",
+              "a_p": [
+                {
+                  "id_n": "left_up_x",
+                  "p_v": 0
+                },
+                {
+                  "id_n": "left_up_y",
+                  "p_v": 0
+                },
+                {
+                  "id_n": "right_down_x",
+                  "p_v": 100
+                },
+                {
+                  "id_n": "right_down_y",
+                  "p_v": 100
+                }
+              ]
+            },
+            "c_v": [
+              {
+                "id_n": "value",
+                "p_v": ""
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "do_action_f": {
+      "zh": "执行",
+      "en": "Execute",
+      "data": {
+        "id_n": "do_action_f",
+        "i_f_o": [
+          {
+            "id_n": "click_xy_a",
+            "a_p": [
+              {
+                "id_n": "x",
+                "p_v": 0
+              },
+              {
+                "id_n": "y",
+                "p_v": 0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "actions": {
+    "click_pic_a": {
+      "zh": "点击图像",
+      "en": "Click Image",
+      "data": {
+        "id_n": "click_pic_a",
+        "a_p": [
+          {
+            "id_n": "picPath",
+            "p_v": ""
+          },
+          {
+            "id_n": "threshold",
+            "p_v": 0.9
+          }
+        ]
+      }
+    },
+    "click_xy_a": {
+      "zh": "点击坐标",
+      "en": "Click Coordinates",
+      "data": {
+        "id_n": "click_xy_a",
+        "a_p": [
+          {
+            "id_n": "x",
+            "p_v": 0
+          },
+          {
+            "id_n": "y",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "scroll_xyxy_a": {
+      "zh": "滑动",
+      "en": "Scroll",
+      "data": {
+        "id_n": "scroll_xyxy_a",
+        "a_p": [
+          {
+            "id_n": "from_x",
+            "p_v": 0
+          },
+          {
+            "id_n": "from_y",
+            "p_v": 0
+          },
+          {
+            "id_n": "to_x",
+            "p_v": 0
+          },
+          {
+            "id_n": "to_y",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "ocr_pic_a": {
+      "zh": "ocr英文识别",
+      "en": "OCR English Recognition",
+      "data": {
+        "id_n": "ocr_pic_a",
+        "a_p": [
+          {
+            "id_n": "left_up_x",
+            "p_v": 0
+          },
+          {
+            "id_n": "left_up_y",
+            "p_v": 0
+          },
+          {
+            "id_n": "right_down_x",
+            "p_v": 100
+          },
+          {
+            "id_n": "right_down_y",
+            "p_v": 100
+          }
+        ]
+      }
+    },
+    "sleep_time_a": {
+      "zh": "等待",
+      "en": "Wait",
+      "data": {
+        "id_n": "sleep_time_a",
+        "a_p": [
+          {
+            "id_n": "time_seconds",
+            "p_v": 1
+          }
+        ]
+      }
+    },
+    "get_pixel_color_a": {
+      "zh": "获取像素颜色",
+      "en": "Get Pixel Color",
+      "data": {
+        "id_n": "get_pixel_color_a",
+        "a_p": [
+          {
+            "id_n": "x",
+            "p_v": 0
+          },
+          {
+            "id_n": "y",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "open_apk_package_a": {
+      "zh": "打开安卓应用",
+      "en": "Open Android App",
+      "data": {
+        "id_n": "open_apk_package_a",
+        "a_p": [
+          {
+            "id_n": "package",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "jump_flow_item_id_a": {
+      "zh": "跳转流程节点",
+      "en": "Jump to Flow Item",
+      "data": {
+        "id_n": "jump_flow_item_id_a",
+        "a_p": [
+          {
+            "id_n": "id",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "set_value_in_dict": {
+      "zh": "设置值",
+      "en": "Set Value in Dictionary",
+      "data": {
+        "id_n": "set_value_in_dict",
+        "a_p": [
+          {
+            "id_n": "name",
+            "p_v": ""
+          },
+          {
+            "id_n": "value",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "get_value_in_dict": {
+      "zh": "获取值",
+      "en": "Get Value from Dictionary",
+      "data": {
+        "id_n": "get_value_in_dict",
+        "a_p": [
+          {
+            "id_n": "name",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "inc_value_in_dict": {
+      "zh": "增加值",
+      "en": "Increase Value in Dictionary",
+      "data": {
+        "id_n": "inc_value_in_dict",
+        "a_p": [
+          {
+            "id_n": "name",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "dec_value_in_dict": {
+      "zh": "减少值",
+      "en": "Decrease Value in Dictionary",
+      "data": {
+        "id_n": "dec_value_in_dict",
+        "a_p": [
+          {
+            "id_n": "name",
+            "p_v": ""
+          }
+        ]
+      }
+    }
+  },
+  "conditions": {
+    "num_greater_p": {
+      "zh": "数字大于",
+      "en": "Number Greater Than",
+      "data": {
+        "id_n": "num_greater_p",
+        "c_obj": {
+          "id_n": "ocr_pic_a",
+          "a_p": [
+            {
+              "id_n": "left_up_x",
+              "p_v": 0
+            },
+            {
+              "id_n": "left_up_y",
+              "p_v": 0
+            },
+            {
+              "id_n": "right_down_x",
+              "p_v": 100
+            },
+            {
+              "id_n": "right_down_y",
+              "p_v": 100
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "value",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "num_less_p": {
+      "zh": "数字小于",
+      "en": "Number Less Than",
+      "data": {
+        "id_n": "num_less_p",
+        "c_obj": {
+          "id_n": "ocr_pic_a",
+          "a_p": [
+            {
+              "id_n": "left_up_x",
+              "p_v": 0
+            },
+            {
+              "id_n": "left_up_y",
+              "p_v": 0
+            },
+            {
+              "id_n": "right_down_x",
+              "p_v": 100
+            },
+            {
+              "id_n": "right_down_y",
+              "p_v": 100
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "value",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "equal_p": {
+      "zh": "相等",
+      "en": "Equal",
+      "data": {
+        "id_n": "equal_p",
+        "c_obj": {
+          "id_n": "ocr_pic_a",
+          "a_p": [
+            {
+              "id_n": "left_up_x",
+              "p_v": 0
+            },
+            {
+              "id_n": "left_up_y",
+              "p_v": 0
+            },
+            {
+              "id_n": "right_down_x",
+              "p_v": 100
+            },
+            {
+              "id_n": "right_down_y",
+              "p_v": 100
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "value",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "not_equal_p": {
+      "zh": "不相等",
+      "en": "Not Equal",
+      "data": {
+        "id_n": "not_equal_p",
+        "c_obj": {
+          "id_n": "ocr_pic_a",
+          "a_p": [
+            {
+              "id_n": "left_up_x",
+              "p_v": 0
+            },
+            {
+              "id_n": "left_up_y",
+              "p_v": 0
+            },
+            {
+              "id_n": "right_down_x",
+              "p_v": 100
+            },
+            {
+              "id_n": "right_down_y",
+              "p_v": 100
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "value",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "include_p": {
+      "zh": "字符串包含",
+      "en": "String Contains",
+      "data": {
+        "id_n": "include_p",
+        "c_obj": {
+          "id_n": "ocr_pic_a",
+          "a_p": [
+            {
+              "id_n": "left_up_x",
+              "p_v": 0
+            },
+            {
+              "id_n": "left_up_y",
+              "p_v": 0
+            },
+            {
+              "id_n": "right_down_x",
+              "p_v": 100
+            },
+            {
+              "id_n": "right_down_y",
+              "p_v": 100
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "value",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "not_include_p": {
+      "zh": "字符串不包含",
+      "en": "String Does Not Contain",
+      "data": {
+        "id_n": "not_include_p",
+        "c_obj": {
+          "id_n": "ocr_pic_a",
+          "a_p": [
+            {
+              "id_n": "left_up_x",
+              "p_v": 0
+            },
+            {
+              "id_n": "left_up_y",
+              "p_v": 0
+            },
+            {
+              "id_n": "right_down_x",
+              "p_v": 100
+            },
+            {
+              "id_n": "right_down_y",
+              "p_v": 100
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "value",
+            "p_v": ""
+          }
+        ]
+      }
+    },
+    "pixel_similar_p": {
+      "zh": "像素点近似",
+      "en": "Pixel Similar",
+      "data": {
+        "id_n": "pixel_similar_p",
+        "c_obj": {
+          "id_n": "get_pixel_color_a",
+          "a_p": [
+            {
+              "id_n": "x",
+              "p_v": 0
+            },
+            {
+              "id_n": "y",
+              "p_v": 0
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "B",
+            "p_v": 0
+          },
+          {
+            "id_n": "G",
+            "p_v": 0
+          },
+          {
+            "id_n": "R",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "pixel_not_similar_p": {
+      "zh": "像素点不近似",
+      "en": "Pixel Not Similar",
+      "data": {
+        "id_n": "pixel_not_similar_p",
+        "c_obj": {
+          "id_n": "get_pixel_color_a",
+          "a_p": [
+            {
+              "id_n": "x",
+              "p_v": 0
+            },
+            {
+              "id_n": "y",
+              "p_v": 0
+            }
+          ]
+        },
+        "c_v": [
+          {
+            "id_n": "B",
+            "p_v": 0
+          },
+          {
+            "id_n": "G",
+            "p_v": 0
+          },
+          {
+            "id_n": "R",
+            "p_v": 0
+          }
+        ]
+      }
+    },
+    "img_match_p": {
+      "zh": "匹配到图像",
+      "en": "Image Matched",
+      "data": {
+        "id_n": "img_match_p",
+        "c_obj": null,
+        "c_v": [
+          {
+            "id_n": "picPath",
+            "p_v": ""
+          },
+          {
+            "id_n": "threshold",
+            "p_v": 0.9
+          }
+        ]
+      }
+    },
+    "img_not_match_p": {
+      "zh": "未匹配到图像",
+      "en": "Image Not Matched",
+      "data": {
+        "id_n": "img_not_match_p",
+        "c_obj": null,
+        "c_v": [
+          {
+            "id_n": "picPath",
+            "p_v": ""
+          },
+          {
+            "id_n": "threshold",
+            "p_v": 0.9
+          }
+        ]
+      }
+    }
+  }
+}

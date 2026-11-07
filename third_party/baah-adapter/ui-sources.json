@@ -1,0 +1,92 @@
+[
+  {
+    "source": "baah/BaahConfigRepository.kt",
+    "sha256": "0d1b3d8b9792443d47dd226383d36f870ec61e32a237a8b9530b2cc445fce008",
+    "changes": "NEO namespace and storage bindings; 415 adds per-language schema/pages/task-choice caches and preload."
+  },
+  {
+    "source": "baah/ui/BaahConfigScreen.kt",
+    "sha256": "a254a008814832e342ccc03eb8c3498d66954a35d0e1ba30eef65cab3ace9c3b",
+    "changes": "NEO namespace/locale binding; 415 normal fields use LazyColumn while preserving config/draft state, load timing logged."
+  },
+  {
+    "source": "baah/ui/BaahConfigManagerScreen.kt",
+    "sha256": "870572b7c112b9e6c35e77e5aedda0e85a296e562d933627175547715e125b47",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahDialog.kt",
+    "sha256": "ec32175db75c6b8efac6593b1c260cfc7795612a984878c3621b4cae4a0406fd",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahSwitch.kt",
+    "sha256": "869f1570d078f8386510d5c71465a7eee4bad8977cda0fb4acbacc0343b0b9b7",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahDropdown.kt",
+    "sha256": "af8567daed77e56b2045a2d63931008c60cd4ee7bdddf834dcfcb5a2b40fb044",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahNumberEditor.kt",
+    "sha256": "29b832e759fced5a897231d0adf05c4ba057e61f9b1f6b8f37c92cac7597e824",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahListEditor.kt",
+    "sha256": "345f1403b33c4cc253b4a325a581eedcf9fdf7d9acc706a8339059896eca7c5f",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahPipelineEditor.kt",
+    "sha256": "b33e70543fda4eb1d12b27be5714a025b2c42f1a8f1aaf17f411be931ee0ba70",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahTeamStrengthEditor.kt",
+    "sha256": "9993a252e3a9815496a219869e1e40abd67003b259fa4235d182609feb4de8ef",
+    "changes": "Package names and locale accessor only; independent NEO host binding"
+  },
+  {
+    "source": "baah/ui/BaahPreviewHost.kt",
+    "sha256": "5f973b810fc8f137e53b04d3f28865ef7c3644ad9784b512653c4de3e7491c35",
+    "changes": "NEO process/display bindings; original layout and animation retained"
+  },
+  {
+    "source": "baah/ui/BaahToolsDialog.kt",
+    "sha256": "835a0388ad3beae7ae8c7c3aa3c9537579ebf0c64a65e96c9f08f8f49ca8e8f0",
+    "changes": "NEO process/display bindings; original layout and animation retained"
+  },
+  {
+    "source": "baah/ui/BaahHangarScreen.kt",
+    "sha256": "8d2ddbf0d3c55fd2d26f949bbc6098b435094c1fce7378c43d8e2c2a9630678f",
+    "changes": "NEO process/display bindings; original layout and animation retained"
+  },
+  {
+    "source": "theme/Type.kt",
+    "sha256": "f6568589d4425f8f599006044d2eba62d0a613b90be60e00d9f901de0323f45f",
+    "changes": "Original baseline implementation removed in 409; visual type-scale values implemented using a new declarative helper."
+  },
+  {
+    "source": "baah/BaahPatches.kt",
+    "sha256": "12226fcfafa594af2bdece95613ad15db59cf766d2243173bc051d4b4f1d652a",
+    "changes": "Namespace and dispatcher; compatibility checks retained"
+  },
+  {
+    "source": "baah/BaahForegroundService.kt (presentation helper functions only)",
+    "sha256": "bc9f1fccbe3a8edc5a2bd2e4ca16bb67fbc73b9e62cddc8d586e79fa64c34928",
+    "changes": "NEO service binding and notification models; no original service implementation copied"
+  },
+  {
+    "source": "baah/BaahLogs.kt",
+    "sha256": "1ea006e7d587486c4d3576107c082ee94d25e8910be84a8d5afbd32b74fc1381",
+    "changes": "NEO paths and namespace"
+  },
+  {
+    "source": "baah/ui/BaahQuickOptionsDialog.kt",
+    "sha256": "665b93f4a4b9e21f22b5ae59c9a75bb825d449291f664eff3e0ad46e503984fe",
+    "changes": "Pure BAAH custom anchored popup/animation retained in QuickOptionsSurface.kt; settings/actions independently bind to NEO."
+  }
+]

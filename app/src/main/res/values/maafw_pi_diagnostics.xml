@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources><string name="option_checkbox_count_at_least">至少选 %1$d 项</string>
+    <string name="option_checkbox_count_at_most">最多选 %1$d 项</string>
+    <string name="option_checkbox_count_between">选 %1$d–%2$d 项</string>
+    <string name="option_checkbox_count_exactly">选 %1$d 项</string>
+
+    
+    <string name="diagnostic_interface_read_failed">读取 interface.json 失败：%1$s</string>
+    <string name="diagnostic_missing_interface_version">缺少 interface_version（PI V2 协议要求为 2）</string>
+    <string name="diagnostic_unsupported_interface_version">不支持 interface_version %1$d（仅支持 2）</string>
+    <string name="diagnostic_json_parse_failed">JSON 解析失败：%1$s</string>
+    <string name="diagnostic_translation_json_parse_failed">翻译文件 JSON 解析失败：%1$s</string>
+    <string name="diagnostic_entry_not_object">%1$s 条目不是对象</string>
+    <string name="diagnostic_required_field_missing">%1$s 缺少 %2$s</string>
+    <string name="diagnostic_resource_path_missing">resource "%1$s" 缺少 path</string>
+    <string name="diagnostic_no_adb_controller">该项目未声明 Adb controller，限定 controller 的任务都不可用</string>
+    <string name="diagnostic_language_path_invalid">languages "%1$s" 的路径不是字符串</string>
+    <string name="diagnostic_import_read_failed">import 分片读取失败，已跳过：%1$s</string>
+    <string name="diagnostic_project_has_no_tasks">项目未声明任何任务</string>
+    <string name="diagnostic_duplicate_declaration">%1$s "%2$s" 重复声明，保留先出现的定义</string>
+    <string name="diagnostic_translation_read_failed">翻译文件读取失败：%1$s</string>
+    <string name="diagnostic_description_read_failed">description 文件读取失败，保留原始文本：%1$s</string>
+    <string name="diagnostic_default_case_missing">option "%1$s" 的 default_case "%2$s" 不在 cases 中</string>
+    <string name="diagnostic_input_has_no_fields">input option "%1$s" 没有可用的 inputs</string>
+    <string name="diagnostic_setting_option_not_global">setting "%1$s" 列出的 option "%2$s" 不在 global_option 里，不显示</string>
+    <string name="diagnostic_password_default_ignored">option "%1$s" 的 password 输入 "%2$s" 不能带 default，已忽略</string>
+    <string name="diagnostic_preset_password_ignored">preset "%1$s" 给 option "%2$s" 的 password 输入 "%3$s" 写了值，已忽略</string>
+    <string name="diagnostic_checkbox_count_adjusted">option "%1$s" 的 %2$s 为 %3$d，已按 %4$d 处理</string>
+    <string name="diagnostic_checkbox_count_ignored">option "%1$s" 的 %2$s 为 %3$d，已忽略</string>
+    <string name="diagnostic_checkbox_default_count_out_of_range">option "%1$s" 的 default_case 有 %2$d 项，不满足：%3$s</string>
+    <string name="diagnostic_unsupported_option_type">option "%1$s" 的 type "%2$s" 在 Android 端不支持，已跳过</string>
+    <string name="diagnostic_invalid_option_type">option "%1$s" 的 type 非法：%2$s</string>
+    <string name="diagnostic_option_case_not_object">option "%1$s" 存在非对象 case</string>
+    <string name="diagnostic_option_case_name_missing">option "%1$s" 存在缺少 name 的 case</string>
+    <string name="diagnostic_invalid_pipeline_type">input "%1$s.%2$s" 的 pipeline_type 非法：%3$s，按 string 处理</string>
+    <string name="diagnostic_regex_compile_failed">input "%1$s.%2$s" 的 verify regex 编译失败：%3$s</string>
+    <string name="diagnostic_missing_reference">引用了不存在的 %1$s "%2$s"</string>
+    <string name="diagnostic_option_cycle">option 引用形成 cycle：%1$s</string>
+    <string name="diagnostic_directory_enumeration_failed">无法枚举 %1$s 目录：%2$s</string>
+    <string name="diagnostic_no_available_resource">没有可用的 resource</string>
+    <string name="diagnostic_resource_selection_missing">resource "%1$s" 已不存在，回退到 %2$s</string>
+    <string name="diagnostic_controller_selection_missing">controller "%1$s" 已不存在，回退到 %2$s</string>
+    <string name="diagnostic_none">无</string>
+    <string name="diagnostic_active_configuration_missing">activeConfigurationId 指向不存在的配置</string>
+    <string name="diagnostic_configured_task_missing">任务 "%1$s" 已不在项目中</string>
+    <string name="diagnostic_runtime_no_resource">没有可用的 resource，无法构造运行环境</string>
+    <string name="diagnostic_option_unset_without_default">option "%1$s" 未设置且没有默认值</string>
+    <string name="diagnostic_invalid_input">option "%1$s" 的输入 "%2$s" 不合法：%3$s</string>
+    <string name="diagnostic_checkbox_count_out_of_range">option "%1$s" 选了 %2$d 项，不满足：%3$s</string>
+    <string name="diagnostic_integer_conversion_failed">option "%1$s" 的输入 "%2$s" 无法转换为整数</string>
+    <string name="diagnostic_boolean_conversion_failed">option "%1$s" 的输入 "%2$s" 无法转换为布尔值</string>
+    </resources>

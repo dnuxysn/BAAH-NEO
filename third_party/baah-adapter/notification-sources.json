@@ -1,0 +1,72 @@
+[
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\BarkProvider.kt",
+    "sha256": "cce3fe78bd954784dcd4b0895e1880da1e925a67ae68f3d1759fdc6678672eb0",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\CustomWebhookProvider.kt",
+    "sha256": "f7d9ad7b7a085dbd3703a942e8ab9c307b94ccee1d03374e4025fcc774fc4acb",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\DingTalkProvider.kt",
+    "sha256": "e7b60ec727f6640ee62c39ff716985f4d397425aa0d51173534f974aef1946cc",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\DiscordProvider.kt",
+    "sha256": "4db5a65fcd9809ab0b03c8c667790614241ba39425be64c27734ff7ca771b222",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\DiscordWebhookProvider.kt",
+    "sha256": "f2d08c9ca02fcf89977f130369a5d710671eb6a813f517bb07782b2e56f541e5",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\GotifyProvider.kt",
+    "sha256": "01fd3941f9c5c277be6a92f6c19b617bf59337f1bda2397b585300fdd9991a45",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\KookProvider.kt",
+    "sha256": "aff1141cb4a80976415793af30bc01eae2f9f5d29459f0f5613dc6cc377b21f5",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\NotificationProvider.kt",
+    "sha256": "aabda93cde27b88a21a4045dd55ec56daef26788f9c4a5145d8f08be45a14f37",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\QmsgProvider.kt",
+    "sha256": "24e2355fde924c89b7032903b8e5b426ac5a94fe5098809c4200dfa68f226fc5",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\ServerChanProvider.kt",
+    "sha256": "83c16ebed022892cfd9b97061d80689549dd13bf3e5051c945dee24bd1f62fc1",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\SmtpProvider.kt",
+    "sha256": "b9ad25d2e8a0485c9d76a8e8c4764dc5d9e48537a2d9533cc8011ff9952e3eab",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\provider\\TelegramProvider.kt",
+    "sha256": "a9d3a39e0b9ea1c7bd5d9dc1e33793bea4a43cfc609b75306faf2dd84cdc37a6",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\util\\HttpClientHelper.kt",
+    "sha256": "5b7cf96ab26e48142bd8a5429b87c3af9fd9243a6d694c308d00c0d864f9b2ee",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  },
+  {
+    "source": "java\\com\\aliothmoon\\maafw\\notification\\NotificationSettings.kt",
+    "sha256": "602c0d19aadf2ec8bca259a377298347990e94e7a48b6cbfb8efb7d3c84f88cc",
+    "status": "Removed in 409; replaced with independent NEO transport in NotificationSettingsManager.kt. Original fingerprints retained for history."
+  }
+]

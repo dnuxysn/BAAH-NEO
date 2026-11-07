@@ -1,0 +1,5 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/neo_startup_background" />
+    <item android:drawable="@drawable/neo_icon" android:width="112dp"
+        android:height="112dp" android:gravity="center" />
+</layer-list>

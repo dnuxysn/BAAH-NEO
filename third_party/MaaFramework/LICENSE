@@ -1,0 +1,4 @@
+License index: LICENSE.md covers MaaFramework (LGPL-3.0).
+share/MaaAgentBinary/LICENSE is the separate optional MaaAgentBinary AGPL-3.0 notice supplied in the official archive.
+The fetch script copies shared libraries from bin, not the MaaAgentBinary executable.
+Full component and distribution audit remains required before publication.

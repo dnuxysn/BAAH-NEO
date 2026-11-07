@@ -1,0 +1,74 @@
+[
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/BarkProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/CustomWebhookProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/DingTalkProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/DiscordProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/DiscordWebhookProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/GotifyProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/KookProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/NotificationProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/QmsgProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/ServerChanProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/SmtpProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/provider/TelegramProvider.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/util/HttpClientHelper.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/notification/NotificationSettings.kt",
+    "tracked_in_maafwapp_baseline": true
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/baah/ui/BaahConfigScreen.kt",
+    "tracked_in_maafwapp_baseline": false
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/baah/ui/BaahHangarScreen.kt",
+    "tracked_in_maafwapp_baseline": false
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/baah/ui/BaahPreviewHost.kt",
+    "tracked_in_maafwapp_baseline": false
+  },
+  {
+    "source": "app/src/main/java/com/aliothmoon/maafw/baah/ui/BaahPipelineEditor.kt",
+    "tracked_in_maafwapp_baseline": false
+  }
+]

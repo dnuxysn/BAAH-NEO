@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:paddingTop="4dp" android:paddingBottom="4dp">
+    <TextView android:id="@+id/baah_notification_title"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Material.Notification.Title"
+        android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+    <TextView android:id="@+id/baah_notification_detail"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Notification"
+        android:maxLines="2" android:ellipsize="end" />
+    <ImageView android:id="@+id/baah_notification_track"
+        android:layout_width="match_parent" android:layout_height="44dp"
+        android:layout_marginTop="12dp" android:scaleType="fitXY"
+        android:contentDescription="@string/baah_notification_progress_description" />
+</LinearLayout>
