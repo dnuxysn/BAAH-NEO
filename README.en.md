@@ -38,7 +38,7 @@ Available tasks and options depend on the installed version of upstream BAAH and
 - Shizuku running and authorized for BAAH NEO.
 - Internet access and enough storage to set up the Python environment and download upstream BAAH and its dependencies on first launch.
 
-This release provides the source code. A prebuilt APK will be available after the distribution materials for the bundled runtime are ready.
+[Download BAAH NEO 0.1.0 APK](https://github.com/dnuxysn/BAAH-NEO/releases/download/v0.1.0/BAAH-NEO-0.1.0.apk).
 
 ### First run
 
