@@ -1,6 +1,6 @@
-# BAAH-AOS 复用清单
+# 适配组件来源与许可
 
-适配层源自基于 MaaFwApp 的 BAAH-AOS。保留原工程 AGPL-3.0 许可证，不将派生 UI或 Python 适配代码声明为独立原创。
+部分界面、配置编辑和适配组件源自 MaaFwApp，保留 AGPL-3.0 许可证，不将派生代码声明为独立原创。
 
 - `sources.json`：Python 适配资源的原始指纹。
 - `ui-sources.json`：复用的配置编辑、预览动画、字体、通知展示、日志等源文件，以及修改说明。

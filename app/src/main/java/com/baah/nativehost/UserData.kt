@@ -95,7 +95,7 @@ class UserData(private val app: Context) {
     }
     private fun convertLegacy(stage: File) {
         val snapshot = JSONObject(File(stage, "settings.json").readText())
-        require(snapshot.optString("format") == "BAAH-AOS-user-data" && snapshot.optInt("version") == 1) { "不支持的 BAAH-AOS 备份版本" }
+        require(snapshot.optString("format") == "BAAH-AOS-user-data" && snapshot.optInt("version") == 1) { "不支持的备份版本" }
         val sourceConfigs = File(stage, "files/BAAH_CONFIGS")
         check(sourceConfigs.isDirectory) { "旧包备份缺少运行配置" }
         // Stage a complete NEO tree; user data overlays the currently installed upstream.

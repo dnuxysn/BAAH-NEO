@@ -297,7 +297,6 @@
   "请先停止任务再重命名配置": "Stop the task before renaming the configuration.",
   "重命名配置失败": "Could not rename the configuration",
   "熄屏挂机": "Screen off",
-  "开源致谢 · BAAH-AOS、BAAH、MaaFramework": "Open source credits · BAAH-AOS, BAAH, MaaFramework",
   "目前没有日志": "No logs yet",
   "确定": "OK",
   "战斗通行证": "Battle Pass",
@@ -581,5 +580,6 @@
   "推短篇剧情/小故事": "Short Story",
   "推支线剧情/社团故事": "Side Story",
   "挑战任务": "Complete Challenge Task",
-  "修改后点保存生效；正在挂机时需重启挂机。": "Changes take effect after saving; restart the running task to apply them."
+  "修改后点保存生效；正在挂机时需重启挂机。": "Changes take effect after saving; restart the running task to apply them.",
+  "开源致谢 · BAAH、MaaFramework": "Open source credits · BAAH, MaaFramework"
 }

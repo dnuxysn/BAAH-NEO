@@ -262,7 +262,7 @@ import org.json.*
         Text("关于", fontSize = 18.sp)
         BaahCard(Modifier.fillMaxWidth()) {
             Text("${app.applicationInfo.loadLabel(app.packageManager)} ${BuildConfig.VERSION_NAME}", fontSize = 16.sp)
-            Text("开源致谢 · BAAH-AOS、BAAH、MaaFramework", fontSize = 12.sp)
+            Text("开源致谢 · BAAH、MaaFramework", fontSize = 12.sp)
         }
     }
     appUpdateReady?.let { release ->

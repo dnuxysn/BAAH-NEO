@@ -126,7 +126,7 @@ BAAH NEO includes code derived from AGPL-3.0 projects. See the project license a
 
 | Project | Role | License and source |
 | --- | --- | --- |
-| BAAH-AOS / MaaFwApp | UI, configuration editor, and adapter code | [Provenance and AGPL-3.0 license](third_party/baah-adapter/README.md) |
+| MaaFwApp | UI, configuration editor, and adapter code | [Provenance and AGPL-3.0 license](third_party/baah-adapter/README.md) |
 | MaaFwApp PI components | Project Interface V2 parser | [Provenance](third_party/MaaFwApp-pi/SOURCE.md) · [License](third_party/MaaFwApp-pi/LICENSE) |
 | MaaFramework | Automation controller and Tasker | LGPL-3.0 · [License](third_party/MaaFramework/LICENSE.md) |
 | Blue Archive Aris Helper | Upstream Python game tasks | MIT |

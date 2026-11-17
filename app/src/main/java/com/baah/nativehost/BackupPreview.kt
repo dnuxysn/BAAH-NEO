@@ -29,7 +29,7 @@ data class BackupPreview(val file: File, val product: String, val configurations
                     } else {
                         settings = json("settings.json") ?: error("备份格式不兼容")
                         require(settings.optString("format") == "BAAH-AOS-user-data" && settings.optInt("version") == 1) { "备份格式不兼容" }
-                        prefix = "files/BAAH_CONFIGS/"; product = "BAAH-AOS"
+                        prefix = "files/BAAH_CONFIGS/"; product = "BAAH NEO"
                     }
                     val configs = names.filter { it.startsWith(prefix) && it.endsWith(".json") }
                     require(configs.isNotEmpty()) { "备份缺少运行配置" }

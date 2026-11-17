@@ -12,7 +12,7 @@ android {
         applicationId = "com.baah.neo"
         minSdk = 28
         targetSdk = 36
-        versionCode = 449
+        versionCode = 450
         versionName = "0.1.2"
         ndk { abiFilters += "arm64-v8a" }
     }

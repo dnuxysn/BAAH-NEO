@@ -158,7 +158,7 @@ BAAH NEO 包含 AGPL-3.0 派生部分，项目许可证见 [LICENSE](LICENSE)。
 
 | 项目 | 用途 | 许可与来源 |
 | --- | --- | --- |
-| BAAH-AOS / MaaFwApp | 界面、配置编辑和适配组件 | [适配来源与 AGPL-3.0 许可](third_party/baah-adapter/README.md) |
+| MaaFwApp | 界面、配置编辑和适配组件 | [适配来源与 AGPL-3.0 许可](third_party/baah-adapter/README.md) |
 | MaaFwApp PI 组件 | Project Interface V2 解析 | [来源说明](third_party/MaaFwApp-pi/SOURCE.md) · [许可证](third_party/MaaFwApp-pi/LICENSE) |
 | MaaFramework | 自动化控制器与 Tasker | LGPL-3.0 · [随附许可证](third_party/MaaFramework/LICENSE.md) |
 | Blue Archive Aris Helper | 上游 Python 游戏任务 | MIT |
