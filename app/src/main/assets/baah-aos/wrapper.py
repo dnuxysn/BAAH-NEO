@@ -73,6 +73,7 @@ BACKOFF_START_SEC = 5.0
 BACKOFF_MAX_SEC = 60.0
 BACKOFF_RESET_AFTER_SEC = 300.0
 STOP_GRACE_SEC = 3.0
+MAX_PRELAUNCH_RETRIES = 3
 
 CONFIG_NAME_RE = __import__("re").compile(r"^[A-Za-z0-9_\-]+$")
 
@@ -294,6 +295,13 @@ class RunnerSupervisor:
             if alive_for >= BACKOFF_RESET_AFTER_SEC:
                 backoff = BACKOFF_START_SEC
             with self._lock:
+                if generation != self._generation or not self._wanted:
+                    continue
+                if self._respawns >= MAX_PRELAUNCH_RETRIES:
+                    self._wanted = False
+                    self._task = None
+                    log(f"虚拟屏准备重试已达上限（{MAX_PRELAUNCH_RETRIES}次），本轮任务失败结束")
+                    continue
                 self._respawns += 1
             log(f"{backoff:.0f}s 后重拉（第 {self._respawns_dict()} 次）")
             time.sleep(backoff)

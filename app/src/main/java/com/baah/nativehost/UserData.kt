@@ -14,8 +14,18 @@ class UserData(private val app: Context) {
     fun names() = configs.listFiles().orEmpty().filter { it.isFile && it.extension == "json" && validName(it.nameWithoutExtension) }.map { it.nameWithoutExtension }.sorted()
     fun read(name: String): JSONObject { require(validName(name)); return JSONObject(File(configs, "$name.json").readText()) }
     fun save(name: String, json: JSONObject) { require(validName(name)); atomic(File(configs, "$name.json"), json.toString(2)) }
-    fun loadSettings() = if (settings.exists()) JSONObject(settings.readText()) else JSONObject().put("schedules", JSONArray())
-    fun saveSettings(value: JSONObject) { atomic(settings, value.toString(2)); settingsRevision.value++ }
+    fun loadSettings(): JSONObject = synchronized(settingsLock) {
+        if (settings.exists()) JSONObject(settings.readText()) else JSONObject().put("schedules", JSONArray())
+    }
+    fun saveSettings(value: JSONObject): Unit = synchronized(settingsLock) {
+        atomic(settings, value.toString(2))
+        settingsRevision.value++
+    }
+    fun updateSettings(update: (JSONObject) -> Unit): Unit = synchronized(settingsLock) {
+        val value = loadSettings()
+        update(value)
+        saveSettings(value)
+    }
     internal fun renameConfigReferences(oldName: String, newName: String) {
         val updated = loadSettings().put("selected", newName)
         val schedules = updated.optJSONArray("schedules")
@@ -125,6 +135,7 @@ class UserData(private val app: Context) {
         check(name !in names()) { "同名配置已存在，请换一个名字" }; save(name, json)
     }
     companion object {
+        private val settingsLock = Any()
         val settingsRevision = kotlinx.coroutines.flow.MutableStateFlow(0L)
         fun appendScheduleLog(settings: JSONObject, rule: JSONObject, result: String) {
             val log = settings.optJSONArray("scheduleLog") ?: org.json.JSONArray()

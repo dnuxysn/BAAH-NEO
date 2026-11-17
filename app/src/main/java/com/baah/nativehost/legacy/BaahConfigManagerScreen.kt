@@ -1,5 +1,6 @@
 // Adapted from BAAH-AOS (MaaFwApp-derived, AGPL-3.0); see third_party/baah-adapter.
 package com.baah.nativehost.legacy
+import com.baah.nativehost.NeoPageHeader
 import com.baah.nativehost.NeoText as Text
 
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -51,12 +52,7 @@ fun BaahConfigManagerScreen(repository: BaahConfigRepository, selected: String,
         }.onFailure { notice = it.message }
     }
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).clickable(onClick = onBack), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                Text("‹", fontSize = 32.sp, color = MaterialTheme.colorScheme.primary)
-            }
-            Text("编辑配置", fontSize = 22.sp)
-        }
+        NeoPageHeader("编辑配置", onBack)
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
         Text("配置文件", Modifier.padding(top = 8.dp, start = 12.dp), fontSize = 20.sp,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)

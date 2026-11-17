@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.baah.nativehost.legacy.*
@@ -157,6 +159,7 @@ import org.json.*
     var logFiles by remember { mutableStateOf<List<java.io.File>?>(null) }
     var exportBaah by remember { mutableStateOf(true) }
     val availableUpdate by app.availableUpdate.collectAsState()
+    val availableNeoUpdate by app.availableAppUpdate.collectAsState()
     val logStore = remember { BaahLogs(app) }
     val logExporter = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri -> uri?.let { app.action { logStore.export(it, exportBaah); result = "日志已导出" } } }
     fun option(key: String, value: Any) { app.action(showBusy = false) { app.data.saveSettings(app.data.loadSettings().put(key, value)); revision++; changed() } }
@@ -181,6 +184,20 @@ import org.json.*
                 }
             }
             Text("切换语言会重新加载界面，运行期间不可切换", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            HorizontalDivider(Modifier.padding(vertical = 12.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Icon(Icons.Outlined.HighQuality, contentDescription = null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.width(8.dp))
+                Text("后台分辨率", Modifier.weight(1f), fontSize = 16.sp)
+                listOf("720p", "1080p").forEach { resolution ->
+                    val selected = settings.optString("backgroundResolution", "720p") == resolution
+                    Row(Modifier.selectable(selected, enabled = !running && !busy, role = Role.RadioButton, onClick = { option("backgroundResolution", resolution) }),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        RadioButton(selected, onClick = null, enabled = !running && !busy)
+                        Text(resolution, fontSize = 14.sp)
+                    }
+                }
+            }
         }
         Text("更新管理", fontSize = 18.sp, modifier = Modifier.padding(top = 12.dp))
         BaahCard(Modifier.fillMaxWidth()) {
@@ -192,21 +209,31 @@ import org.json.*
             Toggle("自动下载更新", settings.optBoolean("autoDownload")) { option("autoDownload", it) }
             Text("仅用于有发布地址的 BAAH 更新", fontSize = 12.sp)
             HorizontalDivider()
-            SettingsAction("检查软件更新", "当前 BAAH NEO：${BuildConfig.VERSION_NAME}", !busy, dimmed = showBusy) { app.action {
+            SettingsAction("检查软件更新", "当前 BAAH NEO：${BuildConfig.VERSION_NAME}" + (availableNeoUpdate?.let { "\n发现NEO新版本：${it.removePrefix("v")}" } ?: ""), !busy, dimmed = showBusy) { app.action {
                 val release = NeoAppUpdates.latest(settings.optBoolean("appBeta"))
-                if (NeoAppUpdates.compareVersions(release.tag, BuildConfig.VERSION_NAME) > 0) appUpdateReady = release
-                else result = "当前已是最新软件版本：${BuildConfig.VERSION_NAME}"
+                if (NeoAppUpdates.compareVersions(release.tag, BuildConfig.VERSION_NAME) > 0) {
+                    app.availableAppUpdate.value = release.tag
+                    appUpdateReady = release
+                } else {
+                    app.availableAppUpdate.value = null
+                    result = "当前已是最新软件版本：${BuildConfig.VERSION_NAME}"
+                }
             } }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(!settings.optBoolean("appBeta"), { option("appBeta", false) }, { Text("稳定版", fontSize = 13.sp) }, modifier = Modifier.height(40.dp))
                 FilterChip(settings.optBoolean("appBeta"), { option("appBeta", true) }, { Text("公测版", fontSize = 13.sp) }, modifier = Modifier.height(40.dp))
             }
-            availableUpdate?.let { Text("发现上游新版本：$it", fontSize = 12.sp) }
             HorizontalDivider()
-            SettingsAction("检查 BAAH 更新", "当前 BAAH：${app.repository.installedVersion()}", !busy, dimmed = showBusy) { app.action {
+            SettingsAction("检查 BAAH 更新", "当前 BAAH：${app.repository.installedVersion()}" + (availableUpdate?.let { "\n发现BAAH新版本：${it.removePrefix("BAAH").removePrefix("v")}" } ?: ""), !busy, dimmed = showBusy) { app.action {
                 val tag = app.runtime.releaseTag(settings.optBoolean("beta"))
                 val version = tag.removePrefix("BAAH").removePrefix("v")
-                if (version == app.repository.installedVersion()) result = "当前已是上游最新版本：$tag" else updateReady = tag
+                if (version == app.repository.installedVersion()) {
+                    app.availableUpdate.value = null
+                    result = "当前已是上游最新版本：$tag"
+                } else {
+                    app.availableUpdate.value = tag
+                    updateReady = tag
+                }
             } }
             Box(Modifier.fillMaxWidth()) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

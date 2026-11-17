@@ -12,5 +12,6 @@ interface IControlService {
     void setScreenPower(boolean on) = 8;
     void mutePackage(String packageName, boolean muted) = 9;
     ParcelFileDescriptor captureBgr() = 10;
+    int createDisplayAtSize(int width, int height) = 11;
     void destroy() = 16777114;
 }

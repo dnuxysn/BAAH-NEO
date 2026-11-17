@@ -230,7 +230,12 @@ class BaahConfigRepository(context: Context) {
             if (record.optString("page") != "setting_task_order" || record.optString("kind") != "ui.select") continue
             val labels = record.optJSONObject("kwargs")?.optJSONObject("option_labels")
                 ?: record.optJSONArray("args")?.optJSONObject(0) ?: continue
-            return labels.keys().asSequence().associateWith { labels.getString(it) }.also { taskCache[safe] = it }
+            return schema.getJSONArray("task_names").let { order ->
+                (0 until order.length()).associate { index ->
+                    val name = order.getString(index)
+                    name to labels.getString(name)
+                }
+            }.also { taskCache[safe] = it }
         }
         return emptyMap()
     }

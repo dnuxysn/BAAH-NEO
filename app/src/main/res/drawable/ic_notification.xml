@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Monochrome version of the geometric emblem at the top of the app icon. -->
+<!-- Flat lower-left halo from the supplied reference, upright for the status bar. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp"
-    android:viewportWidth="24" android:viewportHeight="24">
-    <group android:rotation="15" android:pivotX="12" android:pivotY="12">
-        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="1.8"
-            android:pathData="M4,4H15V15H4ZM10,10H20V20H10Z M17,4H20V7H17Z" />
+    android:viewportWidth="256" android:viewportHeight="256">
+    <group android:translateX="-69" android:translateY="-378">
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+            android:pathData="M80,401H236V556H80Z M92,412H165V428H199V412H224V544H92Z" />
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+            android:pathData="M202,429H315V572H202Z M213,440H305V562H213Z" />
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+            android:pathData="M107,529H202V612H107Z M117,540H192V602H117Z" />
+        <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd"
+            android:pathData="M261,410H300V427H261Z M268,416H293V421H268Z" />
     </group>
 </vector>

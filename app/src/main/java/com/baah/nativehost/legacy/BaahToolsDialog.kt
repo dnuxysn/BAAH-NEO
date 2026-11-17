@@ -44,13 +44,7 @@ internal fun BaahToolsDialog(pageId: String, repository: BaahConfigRepository, c
                         row.forEach { task -> Button({ if (!session.running.value && !session.busy.value) { session.action { session.start(config, task) }; onDismiss() } else message = "请先停止当前任务" },
                             Modifier.weight(1f).height(46.dp), shape = RoundedCornerShape(12.dp),
                             contentPadding = PaddingValues(horizontal = 0.dp, vertical = 2.dp)) {
-                            Text(when (task) {
-                                "推第一部主线剧情" -> "推第一部主\n线剧情"
-                                "推第二部主线剧情" -> "推第二部主\n线剧情"
-                                "推短篇剧情/小故事" -> "推短篇剧情/\n小故事"
-                                "推支线剧情/社团故事" -> "推支线剧情/\n社团故事"
-                                else -> task
-                            }, fontSize = 14.sp, letterSpacing = (-1).sp,
+                            Text(choices[task] ?: task, fontSize = 14.sp, letterSpacing = (-1).sp,
                                 lineHeight = 20.sp, textAlign = TextAlign.Center)
                         } }
                     }

@@ -29,9 +29,10 @@ class RunService : Service() {
                     app.start(config, fromSchedule = id, foreground = !backgroundMode)
                     if (backgroundMode && rule?.optBoolean("screenSaverOnStart") == true) app.sleepScreen(hardware = false)
                 } catch (e: Exception) {
-                    val settings = app.data.loadSettings(); val list = settings.optJSONArray("schedules")
-                    for (i in 0 until (list?.length() ?: 0)) list!!.getJSONObject(i).takeIf { it.optString("id") == id }?.put("lastResult", "启动失败：${e.message}")?.put("inProgress", false)
-                    app.data.saveSettings(settings)
+                    app.data.updateSettings { settings ->
+                        val list = settings.optJSONArray("schedules")
+                        for (i in 0 until (list?.length() ?: 0)) list!!.getJSONObject(i).takeIf { it.optString("id") == id }?.put("lastResult", "启动失败：${e.message}")?.put("inProgress", false)
+                    }
                     update(this@RunService, "定时启动失败：${e.message}"); throw e
                 }
             }

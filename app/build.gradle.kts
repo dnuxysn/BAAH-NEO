@@ -3,6 +3,7 @@ plugins { id("com.android.application"); id("org.jetbrains.kotlin.plugin.compose
 val neoSigning = rootProject.file("neo-signing.properties").takeIf { it.isFile }?.let { file ->
     Properties().apply { file.inputStream().use { load(it) } }
 }
+val hasOnlySource = file("src/only/assets/baah-aos/neo_private.py").isFile
 android {
     namespace = "com.baah.nativehost"
     compileSdk = 36
@@ -11,8 +12,8 @@ android {
         applicationId = "com.baah.neo"
         minSdk = 28
         targetSdk = 36
-        versionCode = 442
-        versionName = "0.1.1"
+        versionCode = 449
+        versionName = "0.1.2"
         ndk { abiFilters += "arm64-v8a" }
     }
     flavorDimensions += "edition"
@@ -23,6 +24,14 @@ android {
             buildConfigField("int", "BRIDGE_PORT", "23320")
             buildConfigField("int", "WRAPPER_PORT", "23420")
             buildConfigField("int", "CONSOLE_PORT", "8020")
+        }
+        if (hasOnlySource) create("only") {
+            dimension = "edition"
+            applicationIdSuffix = ".only"
+            buildConfigField("boolean", "PRIVATE_EDITION", "true")
+            buildConfigField("int", "BRIDGE_PORT", "23321")
+            buildConfigField("int", "WRAPPER_PORT", "23421")
+            buildConfigField("int", "CONSOLE_PORT", "8021")
         }
     }
     buildFeatures { compose = true; aidl = true; buildConfig = true }

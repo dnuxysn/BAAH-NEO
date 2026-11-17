@@ -24,6 +24,7 @@ class ControlService : IControlService.Stub() {
     private val handler = Handler(worker.looper)
     private val frameLock = Any()
     private var display: VirtualDisplay? = null
+    private var resolution = BackgroundResolution.HD
     private var reader: ImageReader? = null
     private var bitmap: Bitmap? = null
     private var latestImage: android.media.Image? = null
@@ -57,10 +58,14 @@ class ControlService : IControlService.Stub() {
     override fun watch(binder: IBinder) {
         owner?.unlinkToDeath(death, 0); owner = binder; binder.linkToDeath(death, 0)
     }
+    override fun createDisplay(): Int = createDisplayAtSize(1280, 720)
     @SuppressLint("WrongConstant") // Shell-only touch/trusted/focus flags are hidden from the public SDK IntDef.
-    override fun createDisplay(): Int = onWorker {
+    override fun createDisplayAtSize(width: Int, height: Int): Int = onWorker {
+        val requested = BackgroundResolution.fromSize(width, height)
+        if (display != null && resolution != requested) releaseDisplay()
+        resolution = requested
         display?.display?.displayId ?: run {
-            val images = ImageReader.newInstance(1280, 720, PixelFormat.RGBA_8888, 3)
+            val images = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 3)
             reader = images
             images.setOnImageAvailableListener({ source ->
                 source.acquireLatestImage()?.let { image ->
@@ -73,13 +78,14 @@ class ControlService : IControlService.Stub() {
             try {
                 val flags = 1 or 8 or 64 or 256 or 1024 or 2048 or 4096 or 16384 or 65536
                 val manager = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-                val created = manager.createVirtualDisplay("BAAH NEO", 1280, 720, 240, images.surface, flags)
+                val created = manager.createVirtualDisplay("BAAH NEO", width, height, requested.density, images.surface, flags)
                     ?: error("系统拒绝创建虚拟屏")
                 display = created; created.display.displayId
             } catch (e: Throwable) { images.close(); reader = null; throw e }
         }
     }
     override fun releaseDisplay() { onWorker {
+        reader?.setOnImageAvailableListener(null, null)
         display?.release(); display = null; latestImage?.close(); latestImage = null; reader?.close(); reader = null
         synchronized(frameLock) { bitmap?.recycle(); bitmap = null; frames = 0; lastFrame = 0; convertedFrame = -1; conversions = 0 }
     } }
@@ -93,7 +99,9 @@ class ControlService : IControlService.Stub() {
             padded.copyPixelsFromBuffer(plane.buffer.apply { rewind() })
             val frame = if (paddedWidth == image.width) padded else
                 Bitmap.createBitmap(padded, 0, 0, image.width, image.height).also { padded.recycle() }
-            bitmap?.recycle(); bitmap = frame; convertedFrame = frames
+            val logical = if (frame.width == BackgroundResolution.LOGICAL_WIDTH && frame.height == BackgroundResolution.LOGICAL_HEIGHT) frame else
+                Bitmap.createScaledBitmap(frame, BackgroundResolution.LOGICAL_WIDTH, BackgroundResolution.LOGICAL_HEIGHT, true).also { frame.recycle() }
+            bitmap?.recycle(); bitmap = logical; convertedFrame = frames
             synchronized(frameLock) { conversions++ }
         }
         bitmap!!.copy(Bitmap.Config.ARGB_8888, false)
@@ -124,9 +132,10 @@ class ControlService : IControlService.Stub() {
     }
     @Synchronized override fun touch(action: Int, x: Float, y: Float): Boolean {
         val id = display?.display?.displayId ?: error("虚拟屏未创建")
-        require(x in 0f..1279f && y in 0f..719f); require(action in listOf(0, 1, 2, 3))
+        val (nativeX, nativeY) = resolution.nativePoint(x, y)
+        require(action in listOf(0, 1, 2, 3))
         if (action == MotionEvent.ACTION_DOWN) downTime = SystemClock.uptimeMillis()
-        val event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, x, y, 0)
+        val event = MotionEvent.obtain(downTime, SystemClock.uptimeMillis(), action, nativeX, nativeY, 0)
         return try {
             event.source = 0x1002
             InputEvent::class.java.getMethod("setDisplayId", Int::class.javaPrimitiveType).invoke(event, id)
@@ -153,6 +162,7 @@ class ControlService : IControlService.Stub() {
     }
     override fun stats() = synchronized(frameLock) {
         JSONObject().put("display", display?.display?.displayId ?: -1).put("frames", frames)
+            .put("nativeWidth", resolution.width).put("nativeHeight", resolution.height).put("nativeDensity", resolution.density)
             .put("pixelConversions", conversions)
             .put("screenOffRequested", screenOff).put("powerCalls", powerCalls).put("powerError", powerError)
             .put("interactive", (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive)

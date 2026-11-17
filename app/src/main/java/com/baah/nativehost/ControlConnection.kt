@@ -58,6 +58,17 @@ class ControlConnection(private val context: Context) {
         Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
     }.getOrDefault(false)
 
+    suspend fun awaitPermission() {
+        // A scheduled cold start can reach the service before the provider delivers its binder.
+        val connected = withTimeoutOrNull(5_000L) {
+            while (!Shizuku.pingBinder()) delay(100L)
+            true
+        } ?: false
+        permission.value = currentPermission()
+        check(connected) { "Shizuku 服务未连接，请先在 Shizuku 中启动服务" }
+        check(granted()) { "请先授予 BAAH NEO Shizuku 权限" }
+    }
+
     fun refreshPermission() {
         if (permission.value != PermissionState.Checking || Shizuku.pingBinder()) {
             permission.value = currentPermission()

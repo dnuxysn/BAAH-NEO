@@ -27,6 +27,7 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun NeoSchedules(app: NeoApp, selected: String) {
     val busy by app.busy.collectAsState(); val running by app.running.collectAsState()
+    val backgroundPermissions by app.backgroundPermissions.collectAsState()
     val settingsRevision by UserData.settingsRevision.collectAsState()
     var revision by remember { mutableIntStateOf(0) }; val settings = remember(revision, settingsRevision) { app.data.loadSettings() }
     val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
@@ -49,6 +50,7 @@ import java.util.UUID
         }
     }
     fun save(entry: JSONObject, delete: Boolean = false) {
+        entry.remove("registeredFor")
         app.action(showBusy = false) {
             if (app.running.value) return@action
             val fresh = app.data.loadSettings(); val schedules = fresh.optJSONArray("schedules") ?: JSONArray()
@@ -67,7 +69,7 @@ import java.util.UUID
             val schedules = fresh.optJSONArray("schedules") ?: return@action
             val entry = (0 until schedules.length()).asSequence().map { schedules.getJSONObject(it) }
                 .firstOrNull { it.getString("id") == id } ?: return@action
-            entry.put("enabled", enabled)
+            entry.put("enabled", enabled).remove("registeredFor")
             app.data.saveSettings(fresh)
             ScheduleReceiver.arm(app)
         }
@@ -88,8 +90,17 @@ import java.util.UUID
         }, windowInsets = WindowInsets(0, 0, 0, 0), colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background, actionIconContentColor = MaterialTheme.colorScheme.primary))
         if (android.os.Build.VERSION.SDK_INT >= 31 && !app.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()) BaahCard(Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp).fillMaxWidth()) {
             Text("系统未允许精确闹钟", style = MaterialTheme.typography.titleMedium)
-            Text("系统可能延迟非精确闹钟，请允许精确闹钟以按设定时刻执行。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("定时尚未登记，请允许精确闹钟以按设定时刻执行。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             TextButton({ app.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${app.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }) { Text("去允许") }
+        }
+        if (backgroundPermissions?.confirmedDenied == true) Row(
+            Modifier.padding(horizontal = 16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("请允许 NEO 自启动及后台运行", Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            TextButton({
+                val vendor = if (android.os.Build.MANUFACTURER.equals("vivo", true)) Intent("com.iqoo.secure.BGSTARTUPMANAGER") else null
+                if (vendor == null || runCatching { app.startActivity(vendor.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isFailure)
+                    app.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${app.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }) { Text("后台运行设置") }
         }
         LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (array.length() == 0) item { Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) { Text("暂无定时规则\n点右上角 ＋ 添加", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
@@ -104,8 +115,17 @@ import java.util.UUID
                             Text("运行配置：${entry.optString("config", entry.optString("runConfigurationId"))}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             val next = runCatching { ScheduleReceiver.next(entry) }.getOrNull()
                             Text(if (!entry.optBoolean("enabled")) "已停用" else "下次：${next?.let { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("MM-dd HH:mm")) } ?: "无"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                            entry.optString("alarmRegistrationError").takeIf { it.isNotBlank() }?.let {
+                                Text("定时未登记：$it", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                            }
                             val result = when (val raw = entry.optString("lastResult", "暂无")) { "SUCCEEDED" -> "完成"; "FAILED" -> "失败"; "RUNNING" -> "运行中"; "STOPPED" -> "已停止"; "INTERRUPTED" -> "已中断"; else -> raw }
-                            Text("上次运行：$result · ${"%.1f".format(entry.optDouble("lastMinutes", 0.0))} 分钟", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            val lastRunAt = maxOf(entry.optLong("lastRunStartedAt", 0), entry.optLong("lastTriggeredAt", 0))
+                            val runTime = lastRunAt.takeIf { it > 0 }?.let {
+                                Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault())
+                                    .format(DateTimeFormatter.ofPattern("MM-dd HH:mm"))
+                            }
+                            val lastRun = "上次运行：$result · ${"%.1f".format(entry.optDouble("lastMinutes", 0.0))} 分钟" + (runTime?.let { " · $it" } ?: "")
+                            Text(lastRun, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         BaahSwitch(entry.optBoolean("enabled"), { setEnabled(entry.getString("id"), it) }, enabled = !busy && !running)
                     }

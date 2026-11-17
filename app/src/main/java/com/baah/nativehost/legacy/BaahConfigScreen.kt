@@ -51,7 +51,7 @@ private fun BaahLoadedConfigScreen(repository: BaahConfigRepository, configName:
     val page = pages.find { it.id == pageId } ?: pages.firstOrNull { group in it.tabs && it.fields.isNotEmpty() }
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("Blue Archive Aris Helper ${repository.installedVersion()}", fontSize = 18.sp)
-        Text("当前配置：$configName · 修改后点保存生效；正在挂机时需重启挂机。", fontSize = 12.sp,
+        Text("修改后点保存生效；正在挂机时需重启挂机。", fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
         onManageConfigs?.let { action ->
             BaahCard(Modifier.fillMaxWidth().clickable(onClick = action)) {

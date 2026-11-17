@@ -223,7 +223,7 @@ def _read_app_vd_id() -> int:
 
 
 def _display_present(prefix: list, vd: int) -> bool:
-    """这块屏现在真的存在、且规格仍是 1280x720 吗（App 关掉屏后 id 会失效）。"""
+    """App 指定的屏仍存在且为 NEO 支持的原生尺寸吗（截图/输入保持逻辑720p）。"""
     out = _run(prefix, ["shell", "dumpsys", "window", "displays"], timeout=25)
     current = None
     for line in out.splitlines():
@@ -233,7 +233,7 @@ def _display_present(prefix: list, vd: int) -> bool:
             continue
         m = VD_SIZE_RE.search(line)
         if m and current == vd:
-            return (int(m.group(1)), int(m.group(2))) == (1280, 720)
+            return (int(m.group(1)), int(m.group(2))) in ((1280, 720), (1920, 1080))
     return False
 
 
@@ -272,7 +272,8 @@ def find_virtual_display(prefix: list, target: str, wait_sec: float = VD_WAIT_SE
 
 def _game_on_display(prefix: list, pkg: str, vd: int) -> bool:
     """
-    游戏是否**已经**在这块虚拟屏上（用于让预启动幂等）。
+    游戏是否在目标虚拟屏的 resumed Activity 上（用于让预启动幂等）。
+    后台或已停止的 ActivityRecord 不能证明游戏正在运行。
 
     ⚠️ 切段必须同时认两种头：`Display #N (activities ...)` 和
     `Display: mDisplayId=N (organized)`。只认前一种的话，**最后一块屏的"段"会一直
@@ -289,7 +290,8 @@ def _game_on_display(prefix: list, pkg: str, vd: int) -> bool:
         if re.match(r"\s*Display: mDisplayId=", line):
             in_target = False
             continue
-        if in_target and pkg in line:
+        if in_target and pkg in line and (
+                "topResumedActivity=" in line or "mResumedActivity=" in line):
             return True
     return False
 
@@ -326,20 +328,27 @@ def _wait_for_frame(prefix: list) -> bool:
     import time as _t
 
     deadline = _t.time() + FRAME_WAIT_SEC
+    last_frame_bytes = 0
+    last_input = "not_checked"
     while _t.time() < deadline:
-        n = _display_frame_bytes(prefix)
-        if n > FRAME_MIN_BYTES:
+        last_frame_bytes = _display_frame_bytes(prefix)
+        if last_frame_bytes > FRAME_MIN_BYTES:
             try:
                 result = subprocess.run(prefix + ["shell", "baah-input-ready"],
                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=8)
-                ready = result.returncode == 0 and result.stdout.strip() == b"ready"
-            except (OSError, subprocess.TimeoutExpired):
+                response = result.stdout.strip()
+                last_input = f"exit={result.returncode}, response={response[:120]!r}"
+                ready = result.returncode == 0 and response == b"ready"
+            except (OSError, subprocess.TimeoutExpired) as error:
+                last_input = type(error).__name__
                 ready = False
             if ready:
-                log(f"虚拟屏已出画且游戏输入窗口就绪（截图 {n} 字节），可以交给 BAAH 了")
+                log(f"虚拟屏已出画且游戏输入窗口就绪（截图 {last_frame_bytes} 字节），可以交给 BAAH 了")
                 return True
+        else:
+            last_input = "not_checked_frame_too_small"
         _t.sleep(3)
-    log("等待虚拟屏画面与游戏输入窗口超时，本轮不启动 BAAH")
+    log(f"等待虚拟屏画面与游戏输入窗口超时：screen_bytes={last_frame_bytes}, input_ready={last_input}；本轮不启动 BAAH")
     return False
 
 
@@ -383,39 +392,37 @@ def prelaunch_on_virtual_display(config_name: str) -> bool:
     # 先落盘，给 input 补丁用（幂等跳过也要写，否则补丁拿不到 id）
     _write_vd_id(vd)
 
-    if _game_on_display(prefix, pkg, vd):
-        log(f"预启动跳过：{pkg} 确实已在 display {vd} 上（幂等）")
-        frames = _wait_for_frame(prefix)
-        if frames:
-            _set_game_on(True)
-        return frames
-
-    log(f"虚拟屏 displayId={vd}，准备把 {pkg} 预启动上去")
-    _run(prefix, ["shell", "am", "force-stop", pkg], timeout=25)
     import time as _time
 
-    _time.sleep(3)
-    out = _run(
-        prefix,
-        ["shell", "am", "start", "--display", str(vd),
-         "--activity-exclude-from-recents", "-n", activity],
-        timeout=40,
-    )
-    for line in out.splitlines():
-        if line.strip():
-            log(f"  am start: {line.strip()}")
-    _time.sleep(3)
+    for attempt in range(2):
+        already_resumed = attempt == 0 and _game_on_display(prefix, pkg, vd)
+        if already_resumed:
+            log(f"预启动跳过：{pkg} 已是 display {vd} 的 resumed Activity（幂等）")
+        else:
+            log(f"虚拟屏 displayId={vd}，准备把 {pkg} 预启动上去")
+            _run(prefix, ["shell", "am", "force-stop", pkg], timeout=25)
+            _time.sleep(3)
+            out = _run(
+                prefix,
+                ["shell", "am", "start", "--display", str(vd),
+                 "--activity-exclude-from-recents", "-n", activity],
+                timeout=40,
+            )
+            for line in out.splitlines():
+                if line.strip():
+                    log(f"  am start: {line.strip()}")
+            _time.sleep(3)
+            if _game_on_display(prefix, pkg, vd):
+                log(f"预启动确认：{pkg} 是 display {vd} 的 resumed Activity")
+            else:
+                log(f"预启动结果未能确认（display {vd} 上没有 resumed 的 {pkg}）")
 
-    if _game_on_display(prefix, pkg, vd):
-        log(f"预启动确认：{pkg} 已在 display {vd} 上 ✓")
-    else:
-        log(f"预启动结果未能确认（display {vd} 上没看到 {pkg}）")
-
-    # 等屏上真的出画（见 _wait_for_frame 的说明）；出画了才在 App 侧显示「运行中」+帧率
-    frames = _wait_for_frame(prefix)
-    if frames:
-        _set_game_on(True)
-    return frames
+        if _wait_for_frame(prefix):
+            _set_game_on(True)
+            return True
+        if attempt == 0:
+            log(f"目标游戏未就绪，仅重启 {pkg} 到原 display {vd} 后再等待一次")
+    return False
 
 
 # ── 配置校验 ──────────────────────────────────────────────────────────────────

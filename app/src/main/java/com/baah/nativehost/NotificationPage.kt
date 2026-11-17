@@ -20,7 +20,7 @@ import com.baah.nativehost.notify.NotificationSettingsManager
     var message by remember { mutableStateOf<String?>(null) }
     fun update(key: String, value: String) { manager.update(key, value); revision++ }
     Column(Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row { TextButton(back) { Text("‹") }; Text("通知设置", fontSize = 20.sp) }
+        NeoPageHeader("通知设置", back)
         Text("实况通知", fontSize = 12.sp)
         BaahCard(Modifier.fillMaxWidth()) {
             Text("展示方式", fontSize = 16.sp); Text("实时更新", fontSize = 12.sp)

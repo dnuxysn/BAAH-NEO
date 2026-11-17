@@ -35,6 +35,10 @@ def install():
         # Writable, independent image matching cv2.imdecode(IMREAD_COLOR).
         image = np.frombuffer(data, np.uint8, offset=16).reshape(height, width, 3).copy()
         config.sessiondict['SCREENSHOT_DATA'] = image
+        # The bridge already normalizes captures and input to logical 720p.
+        # BAAH 2.5.12 must not scale a second time for the native 1080p display.
+        config.sessiondict['NATIVE_SCREENSHOT_WIDTH'] = width
+        config.sessiondict['NATIVE_SCREENSHOT_HEIGHT'] = height
         if output_png:
             cv2.imwrite('./' + values['SCREENSHOT_NAME'], image)
 

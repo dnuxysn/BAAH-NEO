@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -51,12 +50,12 @@ import java.time.format.DateTimeFormatter
     }
     BackHandler(onBack = close)
     Column(Modifier.fillMaxSize().safeDrawingPadding()) {
-        TopAppBar(title = { Text(if (isNew) "新建规则" else "编辑规则") }, navigationIcon = {
-            IconButton(close) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, com.baah.nativehost.UiStrings.text("返回")) }
-        }, actions = {
-            if (!isNew) IconButton({ save(draft, true) }, enabled = !busy && !running) { Icon(Icons.Outlined.DeleteOutline, com.baah.nativehost.UiStrings.text("删除")) }
+        NeoPageHeader(if (isNew) "新建规则" else "编辑规则", close, Modifier.padding(horizontal = 16.dp)) {
+            if (!isNew) IconButton({ save(draft, true) }, enabled = !busy && !running) {
+                Icon(Icons.Outlined.DeleteOutline, UiStrings.text("删除"))
+            }
             TextButton(::submit, enabled = !busy && !running) { Text("保存") }
-        }, windowInsets = WindowInsets(0,0,0,0), colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background))
+        }
         Column(Modifier.verticalScroll(scroll).padding(horizontal = 16.dp).padding(bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             OutlinedTextField(draft.optString("name"), { update("name", it) }, label = { Text("名称") }, placeholder = { Text("未命名规则") }, modifier = Modifier.fillMaxWidth())

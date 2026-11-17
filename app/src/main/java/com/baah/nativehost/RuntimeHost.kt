@@ -199,7 +199,12 @@ class RuntimeHost(private val app: Context, private val onProgress: (String, Int
         } finally { stage.deleteRecursively() }
     }
     suspend fun launch(display: Int) = withContext(Dispatchers.IO) {
-        if (process?.isAlive == true) return@withContext
+        if (process?.isAlive == true) {
+            check(display > 0)
+            // A resolution change may replace the display while the idle host stays alive.
+            File(adapter, "vd_id_app").writeText(display.toString())
+            return@withContext
+        }
         check(ready()); check(display > 0)
         copyAssets("baah-aos", adapter)
         File(adapter, "vd_id_app").writeText(display.toString())
@@ -222,10 +227,24 @@ class RuntimeHost(private val app: Context, private val onProgress: (String, Int
         }
         process = null
     }
-    fun request(path: String, post: Boolean = false): JSONObject {
-        val conn = open("http://127.0.0.1:${BuildConfig.WRAPPER_PORT}$path", post)
-        try { return JSONObject(conn.inputStream.bufferedReader().use { it.readText() }) }
-        finally { conn.disconnect() }
+    suspend fun stopRunner() = withContext(Dispatchers.IO) {
+        if (runCatching { request("/stop", true, timeoutMs = 5_000) }.isSuccess) return@withContext
+        // The wrapper owns a stdin-EOF watchdog that terminates its runner process group.
+        val child = process ?: return@withContext
+        runCatching { child.outputStream.close() }
+        if (!child.waitFor(5, TimeUnit.SECONDS)) child.destroyForcibly()
+        if (process === child) process = null
+    }
+    fun request(path: String, post: Boolean = false, timeoutMs: Int? = null): JSONObject {
+        val conn = open("http://127.0.0.1:${BuildConfig.WRAPPER_PORT}$path")
+        try {
+            if (timeoutMs != null) {
+                conn.connectTimeout = timeoutMs
+                conn.readTimeout = timeoutMs
+            }
+            if (post) { conn.requestMethod = "POST"; conn.doOutput = true; conn.outputStream.close() }
+            return JSONObject(conn.inputStream.bufferedReader().use { it.readText() })
+        } finally { conn.disconnect() }
     }
     private fun spawn(args: List<String>, log: File): Process {
         val libs = File(app.applicationInfo.nativeLibraryDir)

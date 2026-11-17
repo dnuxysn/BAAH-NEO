@@ -5,7 +5,6 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.widget.RemoteViews
 
 enum class BaahPhase { Idle, Preparing, Starting, Running, Stopped, Completed, Failed }
@@ -39,8 +38,6 @@ internal fun buildProgressNotification(
             setProgressBar(R.id.baah_notification_track, 100, percent, false)
         }
         builder.setStyle(Notification.DecoratedCustomViewStyle()).setCustomContentView(view).setCustomBigContentView(view)
-    } else {
-        builder.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.neo_icon))
     }
     return builder.build()
 }

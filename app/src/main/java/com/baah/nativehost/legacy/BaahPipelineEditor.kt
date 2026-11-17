@@ -94,8 +94,8 @@ internal fun BaahPipelineEditor(initial: JSONObject, choices: Map<String, String
                         BaahSwitch(enabled.optBoolean(index, true), { checked -> changeTasks { _, _, flags -> flags.put(index, checked) } })
                         Text("≡", fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("任务 ${index + 1}: ", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(tasks.optString(index), Modifier.weight(1f).clickable { picker = index }, fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.primary)
+                        Text(choices[tasks.optString(index)] ?: tasks.optString(index), Modifier.weight(1f).clickable { picker = index }, fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         PipelineButton("+", Modifier.weight(1f)) { insertTask(index + 1) }

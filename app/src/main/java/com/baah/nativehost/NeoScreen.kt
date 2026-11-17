@@ -23,6 +23,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import org.json.*
 import java.util.UUID
 
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     private val app get() = application as NeoApp
+    private var backgroundPermissionCheck: Job? = null
     override fun onTopResumedActivityChanged(isTopResumedActivity: Boolean) {
         super.onTopResumedActivityChanged(isTopResumedActivity)
         app.mainActivityOnTop.value = isTopResumedActivity
@@ -44,6 +46,16 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         app.control.refreshPermission()
+        if (backgroundPermissionCheck?.isActive != true) backgroundPermissionCheck = lifecycleScope.launch {
+            if (app.control.permission.value == ControlConnection.PermissionState.Checking) {
+                withTimeoutOrNull(2_500) {
+                    app.control.permission.first { it != ControlConnection.PermissionState.Checking }
+                }
+            }
+            app.backgroundPermissions.value = BackgroundPermissionChecker.refresh(this@MainActivity, app.control)
+            android.util.Log.i("NeoPermissions", app.backgroundPermissions.value.toString())
+        }
+        ScheduleReceiver.arm(this)
         if (android.os.Build.VERSION.SDK_INT < 29) app.mainActivityOnTop.value = true
     }
 

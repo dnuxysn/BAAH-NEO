@@ -30,6 +30,8 @@ class NeoApp : Application() {
     val screenBlanked = MutableStateFlow(false)
     val dataRevision = MutableStateFlow(0)
     val availableUpdate = MutableStateFlow<String?>(null)
+    val availableAppUpdate = MutableStateFlow<String?>(null)
+    val backgroundPermissions = MutableStateFlow<BackgroundPermissionStatus?>(null)
     var progressTasks: List<String> = emptyList()
         private set
     val touchTrace = MutableStateFlow<TouchTrace?>(null)
@@ -45,6 +47,7 @@ class NeoApp : Application() {
         private set
     private val operations = Mutex()
     private var startedAt = 0L
+    private var durationLimitJob: Job? = null
     private var stopped = false
     private var currentGame = ""
     private var ownsScreenOff = false
@@ -117,9 +120,6 @@ class NeoApp : Application() {
                             }
                         }
                         val active = snapshot.optBoolean("runner_wanted") || snapshot.optBoolean("runner_alive")
-                        if (running.value && data.loadSettings().let { it.optBoolean("limitEnabled") && System.currentTimeMillis() - startedAt >= it.optInt("limitMinutes", 120).coerceAtLeast(1) * 60_000L }) {
-                            stop(); message.value = "达到单次运行时长限制，任务已停止"
-                        }
                         if (running.value && !active) operations.withLock {
                             if (!running.value || snapshot.optInt("runner_generation", -2) != runGeneration) return@withLock
                             running.value = false
@@ -194,7 +194,7 @@ class NeoApp : Application() {
         foreground: Boolean = false
     ) {
         check(!running.value) { "已有任务在运行" }; check(config in data.names()) { "请先选择有效配置" }
-        check(control.granted()) { "请先在设置页授予 Shizuku 权限" }
+        control.awaitPermission()
         val piEntry = PiProject.resolve(this, singleTask = task != null)
         piRun?.job?.join()
         repository.prepareForRun(config)
@@ -222,7 +222,8 @@ class NeoApp : Application() {
                     }
                 }
             }
-            val id = withContext(Dispatchers.IO) { remote.createDisplay() }
+            val resolution = BackgroundResolution.fromSetting(data.loadSettings().optString("backgroundResolution", "720p"))
+            val id = withContext(Dispatchers.IO) { remote.createDisplayAtSize(resolution.width, resolution.height) }
             display.value = id
             if (controller == null) controller = FrameworkController(remote) { x, y -> touchTrace.value = TouchTrace(x, y, android.os.SystemClock.elapsedRealtime()) }
             if (bridge == null) bridge = AdbBridge(::execute)
@@ -239,21 +240,60 @@ class NeoApp : Application() {
             piRun = run
             runGeneration = run.accepted.await().getInt("runner_generation")
             running.value = true; message.value = "正在启动 $config${task?.let { " / $it" } ?: ""}"
+            startDurationLimit(runGeneration)
             if (data.loadSettings().optBoolean("muteOnStart")) muteGame()
-            data.loadSettings().put("selected", config).let(data::saveSettings)
-            if (fromSchedule != null) {
-                val settings = data.loadSettings(); val list = settings.optJSONArray("schedules")
-                for (i in 0 until (list?.length() ?: 0)) list!!.getJSONObject(i).takeIf { it.optString("id") == fromSchedule }?.put("inProgress", true)?.put("lastResult", "运行中")
-                data.saveSettings(settings)
+            data.updateSettings { settings ->
+                settings.put("selected", config)
+                if (fromSchedule != null) {
+                    val list = settings.optJSONArray("schedules")
+                    for (i in 0 until (list?.length() ?: 0)) list!!.getJSONObject(i).takeIf { it.optString("id") == fromSchedule }?.put("inProgress", true)?.put("lastResult", "运行中")?.put("lastRunStartedAt", startedAt)
+                }
             }
             RunService.update(this, message.value)
         } catch (e: Throwable) { withContext(NonCancellable) { closeSession() }; throw e }
     }
+    private fun startDurationLimit(generation: Int) {
+        durationLimitJob?.cancel()
+        durationLimitJob = null
+        val options = data.loadSettings()
+        if (!options.optBoolean("limitEnabled")) return
+        val minutes = options.optInt("limitMinutes", 120).coerceAtLeast(1)
+        durationLimitJob = scope.launch {
+            delay(minutes * 60_000L)
+            if (!running.value || runGeneration != generation) return@launch
+            durationLimitJob = null
+            android.util.Log.w("NeoRunLimit", "Run generation=$generation exceeded $minutes minutes")
+            stopRun("运行超时")
+        }
+    }
     suspend fun stop() {
+        stopRun("已停止")
+    }
+    private suspend fun stopRun(result: String) {
+        durationLimitJob?.cancel()
+        durationLimitJob = null
         stopped = true
-        if (display.value > 0) runCatching { runtime.request("/stop", true) }
-        if (running.value) { running.value = false; finishRun("已停止") }
-        message.value = "任务已停止"
+        val stoppingGeneration = runGeneration
+        if (result == "运行超时") busy.value = true
+        val wasRunning = running.compareAndSet(true, false)
+        // Persist the outcome before any HTTP or Binder cleanup can block.
+        if (wasRunning) recordResult(result)
+        try {
+            runtime.stopRunner()
+            if (wasRunning) {
+                if (result == "运行超时") busy.value = false
+                finishRun(result)
+            }
+        } finally {
+            if (runGeneration == stoppingGeneration && !running.value) {
+                if (wasRunning && result == "运行超时") {
+                    busy.value = false
+                    message.value = "达到单次运行时长限制，本轮运行超时"
+                } else {
+                    message.value = "任务已停止"
+                }
+            }
+        }
     }
     suspend fun closeSession() {
         keepScheduleScreenOn.value = false
@@ -293,21 +333,30 @@ class NeoApp : Application() {
     }
     private fun recordResult(result: String) {
         if (startedAt == 0L) return
-        val settings = data.loadSettings().put("lastResult", result).put("lastFinishedAt", System.currentTimeMillis())
-            .put("lastMinutes", (System.currentTimeMillis() - startedAt).coerceAtLeast(0) / 60_000.0)
-        data.saveSettings(settings); startedAt = 0L
-        val schedules = settings.optJSONArray("schedules")
-        if (schedules != null) for (i in 0 until schedules.length()) {
-            val schedule = schedules.getJSONObject(i)
-            if (schedule.optString("id") == scheduleId) {
-                schedule.put("inProgress", false).put("lastResult", result)
-                    .put("lastMinutes", settings.getDouble("lastMinutes")).put("lastFinishedAt", System.currentTimeMillis())
-                UserData.appendScheduleLog(settings, schedule, result)
+        val finishedAt = System.currentTimeMillis()
+        data.updateSettings { settings ->
+            settings.put("lastResult", result).put("lastFinishedAt", finishedAt)
+                .put("lastMinutes", (finishedAt - startedAt).coerceAtLeast(0) / 60_000.0)
+            if (result == "完成") settings.put("lastSuccessfulAt", finishedAt)
+            val schedules = settings.optJSONArray("schedules")
+            if (schedules != null) for (i in 0 until schedules.length()) {
+                val schedule = schedules.getJSONObject(i)
+                if (schedule.optString("id") == scheduleId) {
+                    val previousSuccess = lastSuccessfulRunAt(schedule, settings.optJSONArray("scheduleLog"))
+                    schedule.put("inProgress", false).put("lastResult", result)
+                        .put("lastMinutes", settings.getDouble("lastMinutes")).put("lastFinishedAt", finishedAt)
+                    if (result == "完成") schedule.put("lastSuccessfulAt", finishedAt)
+                    else if (previousSuccess != null) schedule.put("lastSuccessfulAt", previousSuccess)
+                    UserData.appendScheduleLog(settings, schedule, result)
+                }
             }
         }
-        data.saveSettings(settings)
+        startedAt = 0L
     }
+
     private suspend fun finishRun(result: String) {
+        durationLimitJob?.cancel()
+        durationLimitJob = null
         keepScheduleScreenOn.value = false
         piRun?.outcome?.complete(result == "完成")
         val before = data.loadSettings()
